@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/shu-xing-dp-by-endlesscheng-isuo/" />
+    <title>树形 DP</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>树形 DP</h1>
+        <div>
+                <time>September 24, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/U7WvvU">原题 LCP 64.二叉树灯饰</a>
+个人赛五道题目的 <a href="https://www.bilibili.com/video/BV1zN4y1K762">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场比赛的看法~</p>
+</blockquote>
+<hr>
+<p>定义状态 (当前节点，祖先节点开关 2 的切换次数的奇偶性，父节点是否切换了开关 3)，每个状态表示从当前状态出发，最少需要操作多少次开关，可以关闭子树所有节点的灯。</p>
+<p>跑一个树形 DP。如果当前受到祖先节点的开关影响后，变成开灯状态，那么可以操作一个或三个开关：</p>
+<ul>
+<li>操作开关 1；</li>
+<li>操作开关 2；</li>
+<li>操作开关 3；</li>
+<li>操作开关 123；</li>
+<li>这四种操作取最小值。</li>
+</ul>
+<p>如果变成关灯状态，那么可以操作零个或两个开关：</p>
+<ul>
+<li>不操作任何一个开关；</li>
+<li>操作开关 12；</li>
+<li>操作开关 13；</li>
+<li>操作开关 23；</li>
+<li>这四种操作取最小值。</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">closeLampInTree</span>(self, root: TreeNode) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@cache</span>  <span style="color:#75715e"># 记忆化搜索</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">f</span>(node: TreeNode, switch2: bool, switch3: bool) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> node <span style="color:#f92672">is</span> <span style="color:#66d9ef">None</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (node<span style="color:#f92672">.</span>val <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">==</span> (switch2 <span style="color:#f92672">==</span> switch3):  <span style="color:#75715e"># 当前节点为开灯</span>
+</span></span><span style="display:flex;"><span>                res1 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                res2 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                res3 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                res123 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> min(res1, res2, res3, res123)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span>:  <span style="color:#75715e"># 当前节点为关灯</span>
+</span></span><span style="display:flex;"><span>                res0 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, switch2, <span style="color:#66d9ef">False</span>)
+</span></span><span style="display:flex;"><span>                res12 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">False</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>                res13 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>                res23 <span style="color:#f92672">=</span> f(node<span style="color:#f92672">.</span>left, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> f(node<span style="color:#f92672">.</span>right, <span style="color:#f92672">not</span> switch2, <span style="color:#66d9ef">True</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> min(res0, res12, res13, res23)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f(root, <span style="color:#66d9ef">False</span>, <span style="color:#66d9ef">False</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">closeLampInTree</span>(<span style="color:#a6e22e">root</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">TreeNode</span>) (<span style="color:#a6e22e">ans</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">tuple</span> <span style="color:#66d9ef">struct</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">node</span>             <span style="color:#f92672">*</span><span style="color:#a6e22e">TreeNode</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">switch2</span>, <span style="color:#a6e22e">switch3</span> <span style="color:#66d9ef">bool</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">dp</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#a6e22e">tuple</span>]<span style="color:#66d9ef">int</span>{} <span style="color:#75715e">// 记忆化搜索
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span> <span style="color:#66d9ef">func</span>(<span style="color:#f92672">*</span><span style="color:#a6e22e">TreeNode</span>, <span style="color:#66d9ef">bool</span>, <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span> = <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">node</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">TreeNode</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#a6e22e">switch3</span> <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">node</span> <span style="color:#f92672">==</span> <span style="color:#66d9ef">nil</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">tuple</span>{<span style="color:#a6e22e">node</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#a6e22e">switch3</span>}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">res</span>, <span style="color:#a6e22e">ok</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">p</span>]; <span style="color:#a6e22e">ok</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">res</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Val</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span> <span style="color:#f92672">==</span> (<span style="color:#a6e22e">switch2</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">switch3</span>) { <span style="color:#75715e">// 当前节点为开灯
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#a6e22e">res1</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res3</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">r123</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">p</span>] = <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">res1</span>, <span style="color:#a6e22e">res2</span>, <span style="color:#a6e22e">res3</span>, <span style="color:#a6e22e">r123</span>)
+</span></span><span style="display:flex;"><span>		} <span style="color:#66d9ef">else</span> { <span style="color:#75715e">// 当前节点为关灯
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#a6e22e">res0</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res12</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">false</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res13</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, <span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res23</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Left</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">node</span>.<span style="color:#a6e22e">Right</span>, !<span style="color:#a6e22e">switch2</span>, <span style="color:#66d9ef">true</span>) <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">p</span>] = <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">res0</span>, <span style="color:#a6e22e">res12</span>, <span style="color:#a6e22e">res13</span>, <span style="color:#a6e22e">res23</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">p</span>]
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">root</span>, <span style="color:#66d9ef">false</span>, <span style="color:#66d9ef">false</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span>, <span style="color:#a6e22e">c</span>, <span style="color:#a6e22e">d</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">b</span> &lt; <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">b</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">c</span> &lt; <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">c</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">d</span> &lt; <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">d</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n)$，其中 $n$ 为二叉树的节点个数。</li>
+<li>空间复杂度：$O(n)$。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

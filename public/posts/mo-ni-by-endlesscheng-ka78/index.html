@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/mo-ni-by-endlesscheng-ka78/" />
+    <title>模拟</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>模拟</h1>
+        <div>
+                <time>October 9, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/the-employee-that-worked-on-the-longest-task">原题 2432.处理用时最长的那个任务的员工</a>
+<a href="https://www.bilibili.com/video/BV11d4y1i7Gs">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场周赛的看法~</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">hardestWorker</span>(self, n: int, logs: List[List[int]]) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans, max_t <span style="color:#f92672">=</span> logs[<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (_, t1), (i, t) <span style="color:#f92672">in</span> pairwise(logs):
+</span></span><span style="display:flex;"><span>            t <span style="color:#f92672">-=</span> t1
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> t <span style="color:#f92672">&gt;</span> max_t <span style="color:#f92672">or</span> t <span style="color:#f92672">==</span> max_t <span style="color:#f92672">and</span> i <span style="color:#f92672">&lt;</span> ans:
+</span></span><span style="display:flex;"><span>                ans, max_t <span style="color:#f92672">=</span> i, t
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">hardestWorker</span>(<span style="color:#a6e22e">n</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">logs</span> [][]<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ans</span>, <span style="color:#a6e22e">maxT</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">logs</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">logs</span>[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> &lt; len(<span style="color:#a6e22e">logs</span>); <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">t</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">i</span>][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> <span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">i</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">t</span> &gt; <span style="color:#a6e22e">maxT</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">t</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">maxT</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">i</span>][<span style="color:#ae81ff">0</span>] &lt; <span style="color:#a6e22e">ans</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span>, <span style="color:#a6e22e">maxT</span> = <span style="color:#a6e22e">logs</span>[<span style="color:#a6e22e">i</span>][<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">t</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

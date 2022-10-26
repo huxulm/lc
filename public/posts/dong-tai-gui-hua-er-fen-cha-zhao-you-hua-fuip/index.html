@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/dong-tai-gui-hua-er-fen-cha-zhao-you-hua-fuip/" />
+    <title>动态规划 &#43; 二分查找优化（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>动态规划 &#43; 二分查找优化（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>October 21, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended-ii">原题 1751.最多可以参加的会议数目 II</a>
+按照结束时间排序。</p>
+</blockquote>
+<p>定义 $f[i][j]$ 表示参加前 $i$ 个会议中的至多 $j$ 个，能得到的会议价值的最大和。</p>
+<p>分类讨论：</p>
+<ul>
+<li>不参加第 $i$ 个会议：$f[i][j] = f[i-1][j]$；</li>
+<li>参加第 $i$ 个会议：$f[i][j] = f[p][j-1] + \textit{value}[i]$，其中 $p$ 是最大的满足 $\textit{endDay}[p]&lt;\textit{startDay}[i]$ 的 $p$，不存在时为 $-1$。</li>
+</ul>
+<p>两者取最大值，即</p>
+<p>$$
+f[i][j] = \max(f[i-1][j],f[p][j-1] + \textit{value}[i])
+$$</p>
+<p>代码实现时，为避免处理 $-1$，可将与 $f$ 有关的下标都 $+1$，即</p>
+<p>$$
+f[i+1][j] = \max(f[i][j], f[p+1][j-1]+\textit{value}[i])
+$$</p>
+<p>答案为 $f[n][k]$。</p>
+<p>代码实现时，由于结束时间是有序的，$p$ 可以用二分查找计算出来。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">maxValue</span>(self, events: List[List[int]], k: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        events<span style="color:#f92672">.</span>sort(key<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> e: e[<span style="color:#ae81ff">1</span>])
+</span></span><span style="display:flex;"><span>        n <span style="color:#f92672">=</span> len(events)
+</span></span><span style="display:flex;"><span>        f <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> (k <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, (start, end, val) <span style="color:#f92672">in</span> enumerate(events):
+</span></span><span style="display:flex;"><span>            p <span style="color:#f92672">=</span> bisect_left(events, start, hi<span style="color:#f92672">=</span>i, key<span style="color:#f92672">=</span><span style="color:#66d9ef">lambda</span> e: e[<span style="color:#ae81ff">1</span>])  <span style="color:#75715e"># hi=i 表示二分上界为 i（默认为 n）</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, k <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e"># 为什么是 p 不是 p+1：上面算的是 &gt;= start，-1 后得到 &lt; start，但由于还要 +1，抵消了</span>
+</span></span><span style="display:flex;"><span>                f[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>][j] <span style="color:#f92672">=</span> max(f[i][j], f[p][j <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> val)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f[n][k]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">maxValue</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> events<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> k<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">sort</span><span style="color:#f92672">(</span>events<span style="color:#f92672">,</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">,</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">-&gt;</span> a<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> b<span style="color:#f92672">[</span>1<span style="color:#f92672">]);</span> <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        var n <span style="color:#f92672">=</span> events<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        var f <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>n <span style="color:#f92672">+</span> 1<span style="color:#f92672">][</span>k <span style="color:#f92672">+</span> 1<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> n<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            var p <span style="color:#f92672">=</span> search<span style="color:#f92672">(</span>events<span style="color:#f92672">,</span> i<span style="color:#f92672">,</span> events<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>0<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var j <span style="color:#f92672">=</span> 1<span style="color:#f92672">;</span> j <span style="color:#f92672">&lt;=</span> k<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>j<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>                f<span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> 1<span style="color:#f92672">][</span>j<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> Math<span style="color:#f92672">.</span><span style="color:#a6e22e">max</span><span style="color:#f92672">(</span>f<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>j<span style="color:#f92672">],</span> f<span style="color:#f92672">[</span>p <span style="color:#f92672">+</span> 1<span style="color:#f92672">][</span>j <span style="color:#f92672">-</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">+</span> events<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>2<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f<span style="color:#f92672">[</span>n<span style="color:#f92672">][</span>k<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 返回 endDay &lt; upper 的最大下标
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">search</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> events<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> right<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> upper<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var left <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>left <span style="color:#f92672">+</span> 1 <span style="color:#f92672">&lt;</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            var mid <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>left <span style="color:#f92672">+</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> 2<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>events<span style="color:#f92672">[</span>mid<span style="color:#f92672">][</span>1<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;</span> upper<span style="color:#f92672">)</span> left <span style="color:#f92672">=</span> mid<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span> right <span style="color:#f92672">=</span> mid<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> left<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> maxValue(vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">&amp;</span>events, <span style="color:#66d9ef">int</span> k) {
+</span></span><span style="display:flex;"><span>        sort(events.begin(), events.end(), [](<span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>a, <span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>b) { <span style="color:#66d9ef">return</span> a[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&lt;</span> b[<span style="color:#ae81ff">1</span>]; }); <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> events.size(), f[n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>][k <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>        memset(f, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(f));
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> p <span style="color:#f92672">=</span> lower_bound(events.begin(), events.begin() <span style="color:#f92672">+</span> i, events[i][<span style="color:#ae81ff">0</span>],
+</span></span><span style="display:flex;"><span>                                [](<span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>e, <span style="color:#66d9ef">int</span> lower) { <span style="color:#66d9ef">return</span> e[<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&lt;</span> lower; }) <span style="color:#f92672">-</span> events.begin();
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>; j <span style="color:#f92672">&lt;=</span> k; <span style="color:#f92672">++</span>j)
+</span></span><span style="display:flex;"><span>                <span style="color:#75715e">// 为什么是 p 不是 p+1：上面算的是 &gt;= events[i][0]，-1 后得到 &lt; events[i][0]，但由于还要 +1，抵消了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                f[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>][j] <span style="color:#f92672">=</span> max(f[i][j], f[p][j <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> events[i][<span style="color:#ae81ff">2</span>]);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f[n][k];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">maxValue</span>(<span style="color:#a6e22e">events</span> [][]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Slice</span>(<span style="color:#a6e22e">events</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">events</span>[<span style="color:#a6e22e">i</span>][<span style="color:#ae81ff">1</span>] &lt; <span style="color:#a6e22e">events</span>[<span style="color:#a6e22e">j</span>][<span style="color:#ae81ff">1</span>] }) <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">events</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span> <span style="color:#f92672">:=</span> make([][]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">f</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">i</span>] = make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">e</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">events</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Search</span>(<span style="color:#a6e22e">i</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">events</span>[<span style="color:#a6e22e">j</span>][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>] })
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">j</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">k</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#75715e">// 为什么是 p 不是 p+1：上面算的是 &gt;= e[0]，-1 后得到 &lt; e[0]，但由于还要 +1，抵消了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>][<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>], <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">p</span>][<span style="color:#a6e22e">j</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]<span style="color:#f92672">+</span><span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">2</span>])
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">n</span>][<span style="color:#a6e22e">k</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">b</span> &gt; <span style="color:#a6e22e">a</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span></code></pre></div><h4 id="编程小课堂--标准库二分的灵活运用">编程小课堂 · 标准库二分的灵活运用</h4>
+<p>在写二分题目时，经常会遇到形如「在有序数组中查询大于某个数的最小数」这类问题。具体来说有四类：</p>
+<ul>
+<li>$\ge$：在有序数组中查询大于或等于某个数的最小数；</li>
+<li>$&gt;$：在有序数组中查询大于某个数的最小数；</li>
+<li>$\le$：在有序数组中查询小于或等于某个数的最大数；</li>
+<li>$&lt;$：在有序数组中查询小于某个数的最大数。</li>
+</ul>
+<p>上面的 Python/C++/Go 代码都中用到了标准库中的二分，但这些二分在设计的时候，只提供了查询 $\ge$ 和 $&gt;$ 的功能，并没有提供查询 $\le$ 和 $&lt;$ 的功能。</p>
+<p>没有关系，稍微转换下就能解决。比如查询 $\ge$ 得到了下标 $i$，那么 $i-1$ 就是 $&lt;$ 的结果了（假设数组为升序），同理 $\le$ 可以用 $&gt;$ 算出来。</p>
+<blockquote>
+<p>注：$&gt;$ 和 $\ge$ 也可以转换，对于整数来说，$&gt; x$ 等价于 $\ge x+1$。</p>
+</blockquote>
+<h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(nk+n\log n)$，其中 $n$ 为 $\textit{events}$ 的长度。</li>
+<li>空间复杂度：$O(nk)$。</li>
+</ul>
+<h4 id="相似题目">相似题目</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/maximum-profit-in-job-scheduling/">1235. 规划兼职工作</a></li>
+<li><a href="https://leetcode.cn/problems/maximum-earnings-from-taxi/">2008. 出租车的最大盈利</a></li>
+</ul>
+<hr>
+<p>欢迎关注我的B站频道：<a href="https://space.bilibili.com/206214">灵茶山艾府</a>，每周更新算法讲解视频哦~</p>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

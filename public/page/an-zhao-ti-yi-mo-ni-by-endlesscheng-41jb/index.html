@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/an-zhao-ti-yi-mo-ni-by-endlesscheng-41jb/" />
+    <title>按题意模拟</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>按题意模拟</h1>
+        <div>
+                <time>September 25, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/D9PW8w">原题 LCP 62.交通枢纽</a></p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">transportationHub</span>(self, path: List[List[int]]) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        nodes <span style="color:#f92672">=</span> set()
+</span></span><span style="display:flex;"><span>        out_deg <span style="color:#f92672">=</span> Counter()
+</span></span><span style="display:flex;"><span>        in_deg <span style="color:#f92672">=</span> Counter()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> x, y <span style="color:#f92672">in</span> path:
+</span></span><span style="display:flex;"><span>            nodes<span style="color:#f92672">.</span>add(x)
+</span></span><span style="display:flex;"><span>            nodes<span style="color:#f92672">.</span>add(y)
+</span></span><span style="display:flex;"><span>            out_deg[x] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            in_deg[y] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> x <span style="color:#f92672">in</span> nodes:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> out_deg[x] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">and</span> in_deg[x] <span style="color:#f92672">==</span> len(nodes) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> x
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">transportationHub</span>(<span style="color:#a6e22e">path</span> [][]<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">nodes</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int</span>]<span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">outDeg</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int</span>]<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">inDeg</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int</span>]<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">path</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">p</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">p</span>[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">nodes</span>[<span style="color:#a6e22e">x</span>] = <span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">nodes</span>[<span style="color:#a6e22e">y</span>] = <span style="color:#66d9ef">struct</span>{}{}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">outDeg</span>[<span style="color:#a6e22e">x</span>]<span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">inDeg</span>[<span style="color:#a6e22e">y</span>]<span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nodes</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">outDeg</span>[<span style="color:#a6e22e">x</span>] <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">inDeg</span>[<span style="color:#a6e22e">x</span>] <span style="color:#f92672">==</span> len(<span style="color:#a6e22e">nodes</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

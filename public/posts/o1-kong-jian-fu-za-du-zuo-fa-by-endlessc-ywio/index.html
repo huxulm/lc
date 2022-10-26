@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/o1-kong-jian-fu-za-du-zuo-fa-by-endlessc-ywio/" />
+    <title>贪心 &#43; O(1) 空间复杂度做法（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>贪心 &#43; O(1) 空间复杂度做法（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>October 2, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/minimize-xor">原题 2429.最小 XOR</a>
+<a href="https://www.bilibili.com/video/BV1kd4y1q7fC">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场周赛的看法~</p>
+</blockquote>
+<hr>
+<p>设 $c_1$ 为 $\textit{num}_1$ 的置位数，$c_2$ 为 $\textit{num}_2$ 的置位数。</p>
+<p>基本思路：</p>
+<p>$x$ 的置位数和 $\textit{num}_2$ 相同，意味着 $x$ 的二进制表示中有 $c_2$ 个 $1$，我们需要合理地分配这 $c_2$ 个 $1$。</p>
+<p>为了让异或和尽量小，这些 $1$ 应当从高位到低位匹配 $\textit{num}_1$ 中的 $1$；如果匹配完了还有多余的 $1$，那么就从低位到高位把 $0$ 改成 $1$。</p>
+<p>考虑直接在 $\textit{num}_1$ 上修改，分类讨论：</p>
+<ul>
+<li>如果 $c_2&lt;c_1$，那么将 $\textit{num}_1$ 的最低的 $c_1-c_2$ 个 $1$ 变成 $0$，其结果就是 $x$；</li>
+<li>如果 $c_2&gt;c_1$，那么将 $\textit{num}_1$ 的最低的 $c_2-c_1$ 个 $0$ 变成 $1$，其结果就是 $x$；</li>
+</ul>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">minimizeXor</span>(self, num1: int, num2: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        c1 <span style="color:#f92672">=</span> num1<span style="color:#f92672">.</span>bit_count()
+</span></span><span style="display:flex;"><span>        c2 <span style="color:#f92672">=</span> num2<span style="color:#f92672">.</span>bit_count()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> c2 <span style="color:#f92672">&lt;</span> c1:
+</span></span><span style="display:flex;"><span>            num1 <span style="color:#f92672">&amp;=</span> num1 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e"># 最低的 1 变成 0</span>
+</span></span><span style="display:flex;"><span>            c2 <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> c2 <span style="color:#f92672">&gt;</span> c1:
+</span></span><span style="display:flex;"><span>            num1 <span style="color:#f92672">|=</span> num1 <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>  <span style="color:#75715e"># 最低的 0 变成 1</span>
+</span></span><span style="display:flex;"><span>            c2 <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> num1
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">minimizeXor</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> num1<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> num2<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var c1 <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">bitCount</span><span style="color:#f92672">(</span>num1<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        var c2 <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">bitCount</span><span style="color:#f92672">(</span>num2<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(;</span> c2 <span style="color:#f92672">&lt;</span> c1<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>c2<span style="color:#f92672">)</span> num1 <span style="color:#f92672">&amp;=</span> num1 <span style="color:#f92672">-</span> 1<span style="color:#f92672">;</span> <span style="color:#75715e">// 最低的 1 变成 0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(;</span> c2 <span style="color:#f92672">&gt;</span> c1<span style="color:#f92672">;</span> <span style="color:#f92672">--</span>c2<span style="color:#f92672">)</span> num1 <span style="color:#f92672">|=</span> num1 <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span> <span style="color:#75715e">// 最低的 0 变成 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> num1<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> minimizeXor(<span style="color:#66d9ef">int</span> num1, <span style="color:#66d9ef">int</span> num2) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> c1 <span style="color:#f92672">=</span> __builtin_popcount(num1);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> c2 <span style="color:#f92672">=</span> __builtin_popcount(num2);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (; c2 <span style="color:#f92672">&lt;</span> c1; <span style="color:#f92672">++</span>c2) num1 <span style="color:#f92672">&amp;=</span> num1 <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// 最低的 1 变成 0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> (; c2 <span style="color:#f92672">&gt;</span> c1; <span style="color:#f92672">--</span>c2) num1 <span style="color:#f92672">|=</span> num1 <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>; <span style="color:#75715e">// 最低的 0 变成 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> num1;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">minimizeXor</span>(<span style="color:#a6e22e">num1</span>, <span style="color:#a6e22e">num2</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">c1</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bits</span>.<span style="color:#a6e22e">OnesCount</span>(uint(<span style="color:#a6e22e">num1</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">c2</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">bits</span>.<span style="color:#a6e22e">OnesCount</span>(uint(<span style="color:#a6e22e">num2</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> ; <span style="color:#a6e22e">c2</span> &lt; <span style="color:#a6e22e">c1</span>; <span style="color:#a6e22e">c2</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">num1</span> <span style="color:#f92672">&amp;=</span> <span style="color:#a6e22e">num1</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e">// 最低的 1 变成 0
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> ; <span style="color:#a6e22e">c2</span> &gt; <span style="color:#a6e22e">c1</span>; <span style="color:#a6e22e">c2</span><span style="color:#f92672">--</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">num1</span> <span style="color:#f92672">|=</span> <span style="color:#a6e22e">num1</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span> <span style="color:#75715e">// 最低的 0 变成 1
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">num1</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(|\log\textit{num}_1 - \log\textit{num}_2|)$。</li>
+<li>空间复杂度：$O(1)$，仅用到若干变量。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

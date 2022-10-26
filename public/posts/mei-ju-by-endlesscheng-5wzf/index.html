@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/mei-ju-by-endlesscheng-5wzf/" />
+    <title>暴力枚举模拟</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>暴力枚举模拟</h1>
+        <div>
+                <time>September 24, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/EXvqDp">原题 LCP 63.弹珠游戏</a>
+个人赛五道题目的 <a href="https://www.bilibili.com/video/BV1zN4y1K762">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场比赛的看法~</p>
+</blockquote>
+<hr>
+<p>由于路径是唯一的，一个入口只会对应一个唯一的出口；一个出口+进入出口的方向，可以找到唯一的入口。</p>
+<p>因此，从不同入口出发的弹珠，走过的路径在同一个格子上是不会重叠的（方向相反不算重叠），且路径不存在环（可以画图理解）。</p>
+<p>枚举所有入口，模拟即可。不需要 DFS，写个循环就行。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>DIRS <span style="color:#f92672">=</span> ((<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>), (<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>), (<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>), (<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>))  <span style="color:#75715e"># 右下左上（顺时针）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">ballGame</span>(self, num: int, plate: List[str]) <span style="color:#f92672">-&gt;</span> List[List[int]]:
+</span></span><span style="display:flex;"><span>        m, n <span style="color:#f92672">=</span> len(plate), len(plate[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">check</span>(x: int, y: int, d: int) <span style="color:#f92672">-&gt;</span> bool:
+</span></span><span style="display:flex;"><span>            left <span style="color:#f92672">=</span> num
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> plate[x][y] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;O&#39;</span>:
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> left <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span>: <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>  <span style="color:#75715e"># 无剩余步数</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> plate[x][y] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;W&#39;</span>:   d <span style="color:#f92672">=</span> (d <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># 逆时针</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">elif</span> plate[x][y] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;E&#39;</span>: d <span style="color:#f92672">=</span> (d <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">4</span>  <span style="color:#75715e"># 顺时针</span>
+</span></span><span style="display:flex;"><span>                x <span style="color:#f92672">+=</span> DIRS[d][<span style="color:#ae81ff">0</span>]
+</span></span><span style="display:flex;"><span>                y <span style="color:#f92672">+=</span> DIRS[d][<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#f92672">not</span> (<span style="color:#ae81ff">0</span> <span style="color:#f92672">&lt;=</span> x <span style="color:#f92672">&lt;</span> m <span style="color:#f92672">and</span> <span style="color:#ae81ff">0</span> <span style="color:#f92672">&lt;=</span> y <span style="color:#f92672">&lt;</span> n): <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">False</span>  <span style="color:#75715e"># 出界</span>
+</span></span><span style="display:flex;"><span>                left <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> <span style="color:#66d9ef">True</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> plate[<span style="color:#ae81ff">0</span>][j] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">and</span> check(<span style="color:#ae81ff">0</span>, j, <span style="color:#ae81ff">1</span>): ans<span style="color:#f92672">.</span>append([<span style="color:#ae81ff">0</span>, j])  <span style="color:#75715e"># 上边</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> plate[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>][j] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">and</span> check(m <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, j, <span style="color:#ae81ff">3</span>): ans<span style="color:#f92672">.</span>append([m <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, j])  <span style="color:#75715e"># 下边</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">1</span>, m <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> plate[i][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">and</span> check(i, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>): ans<span style="color:#f92672">.</span>append([i, <span style="color:#ae81ff">0</span>])  <span style="color:#75715e"># 左边</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> plate[i][<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">and</span> check(i, n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>): ans<span style="color:#f92672">.</span>append([i, n <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>])  <span style="color:#75715e"># 右边</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">dirs</span> = []<span style="color:#66d9ef">struct</span>{ <span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span> <span style="color:#66d9ef">int</span> }{{<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>}, {<span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>}, {<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>}, {<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>}} <span style="color:#75715e">// 右下左上（顺时针）
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">ballGame</span>(<span style="color:#a6e22e">num</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">plate</span> []<span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">ans</span> [][]<span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">m</span>, <span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">plate</span>), len(<span style="color:#a6e22e">plate</span>[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">check</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span>, <span style="color:#a6e22e">d</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">num</span>; <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">x</span>][<span style="color:#a6e22e">y</span>] <span style="color:#f92672">!=</span> <span style="color:#e6db74">&#39;O&#39;</span>; <span style="color:#a6e22e">left</span><span style="color:#f92672">--</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">0</span> { <span style="color:#75715e">// 无剩余步数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">x</span>][<span style="color:#a6e22e">y</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;W&#39;</span> { <span style="color:#75715e">// 逆时针
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#a6e22e">d</span> = (<span style="color:#a6e22e">d</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">3</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>			} <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">x</span>][<span style="color:#a6e22e">y</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;E&#39;</span> { <span style="color:#75715e">// 顺时针
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#a6e22e">d</span> = (<span style="color:#a6e22e">d</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">%</span> <span style="color:#ae81ff">4</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">x</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">dirs</span>[<span style="color:#a6e22e">d</span>].<span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">y</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">dirs</span>[<span style="color:#a6e22e">d</span>].<span style="color:#a6e22e">y</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">x</span> &lt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">m</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">y</span> &lt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">n</span> { <span style="color:#75715e">// 从另一边出去了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">false</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">j</span> &lt; <span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#ae81ff">0</span>][<span style="color:#a6e22e">j</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">check</span>(<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">j</span>, <span style="color:#ae81ff">1</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> = append(<span style="color:#a6e22e">ans</span>, []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">0</span>, <span style="color:#a6e22e">j</span>})
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">m</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>][<span style="color:#a6e22e">j</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">check</span>(<span style="color:#a6e22e">m</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">j</span>, <span style="color:#ae81ff">3</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> = append(<span style="color:#a6e22e">ans</span>, []<span style="color:#66d9ef">int</span>{<span style="color:#a6e22e">m</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">j</span>})
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span> &lt; <span style="color:#a6e22e">m</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">i</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">i</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">check</span>(<span style="color:#a6e22e">i</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> = append(<span style="color:#a6e22e">ans</span>, []<span style="color:#66d9ef">int</span>{<span style="color:#a6e22e">i</span>, <span style="color:#ae81ff">0</span>})
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">plate</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">==</span> <span style="color:#e6db74">&#39;.&#39;</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">check</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">n</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">2</span>) {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> = append(<span style="color:#a6e22e">ans</span>, []<span style="color:#66d9ef">int</span>{<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">n</span> <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>})
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(mn)$，其中 $m$ 和 $n$ 分别为 $\textit{plate}$ 的行数和列数。每个状态（横坐标，纵坐标，方向）至多被访问一次，总共有 $4mn$ 个状态。</li>
+<li>空间复杂度：$O(1)$。返回值不计入。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

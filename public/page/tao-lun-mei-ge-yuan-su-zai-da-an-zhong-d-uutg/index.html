@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/tao-lun-mei-ge-yuan-su-zai-da-an-zhong-d-uutg/" />
+    <title>贡献法：讨论每个元素在答案中的出现次数</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>贡献法：讨论每个元素在答案中的出现次数</h1>
+        <div>
+                <time>October 1, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/bitwise-xor-of-all-pairings">原题 2425.所有数对的异或和</a>
+<a href="https://www.bilibili.com/video/BV1tW4y1e7rb">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场双周赛的看法~</p>
+</blockquote>
+<hr>
+<p>由于答案是一大堆数字的异或和，根据<strong>贡献法</strong>的思想，我们可以讨论每个数字在这一大堆数字中出现了多少次，对答案的贡献是多少。</p>
+<p>设 $n$ 为 $\textit{nums}_1$ 的长度，$m$ 为 $\textit{nums}_2$ 的长度。</p>
+<p>对于 $\textit{nums}_1[i]$，由于它要与 $\textit{nums}_2$ 的每个元素异或一次，因此它一共出现了 $m$ 次。由于一个元素异或它自己等于 $0$，因此如果 $m$ 是偶数，则 $\textit{nums}_1[i]$ 对答案的贡献是 $0$，否则是 $\textit{nums}_1[i]$。</p>
+<p>对于 $\textit{nums}_2$ 的元素，分析同理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">xorAllNums</span>(self, nums1: List[int], nums2: List[int]) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(nums2) <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>: ans <span style="color:#f92672">^=</span> reduce(xor, nums1)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> len(nums1) <span style="color:#f92672">%</span> <span style="color:#ae81ff">2</span>: ans <span style="color:#f92672">^=</span> reduce(xor, nums2)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">xorAllNums</span>(<span style="color:#a6e22e">nums1</span>, <span style="color:#a6e22e">nums2</span> []<span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">ans</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">nums2</span>)<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums1</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> ^= <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> len(<span style="color:#a6e22e">nums1</span>)<span style="color:#f92672">%</span><span style="color:#ae81ff">2</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums2</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> ^= <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n+m)$，其中 $n$ 为 $\textit{nums}_1$ 的长度，$m$ 为 $\textit{nums}_2$ 的长度。</li>
+<li>空间复杂度：$O(1)$，仅用到若干变量。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

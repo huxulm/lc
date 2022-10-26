@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/by-endlesscheng-1f1r/" />
+    <title>两种做法：暴力枚举 / 利用 GCD 的性质</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>两种做法：暴力枚举 / 利用 GCD 的性质</h1>
+        <div>
+                <time>October 23, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/number-of-subarrays-with-gcd-equal-to-k">原题 2447.最大公因数等于 K 的子数组数目</a>
+<a href="https://www.bilibili.com/video/BV1ne4y1e7nu">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场周赛的看法~</p>
+</blockquote>
+<hr>
+<h1 id="方法一暴力枚举">方法一：暴力枚举</h1>
+<p>暴力枚举即可，可以在不包含因子 $k$ 时提前退出循环。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">subarrayGCD</span>(self, nums: List[int], k: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i <span style="color:#f92672">in</span> range(len(nums)):
+</span></span><span style="display:flex;"><span>            g <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(i, len(nums)):
+</span></span><span style="display:flex;"><span>                g <span style="color:#f92672">=</span> gcd(g, nums[j])
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> g <span style="color:#f92672">%</span> k: <span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> g <span style="color:#f92672">==</span> k: ans <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">subarrayGCD</span>(<span style="color:#a6e22e">nums</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">ans</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">g</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums</span>[<span style="color:#a6e22e">i</span>:] {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">g</span> = <span style="color:#a6e22e">gcd</span>(<span style="color:#a6e22e">g</span>, <span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">g</span><span style="color:#f92672">%</span><span style="color:#a6e22e">k</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">break</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">g</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">k</span> {
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">ans</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">gcd</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> = <span style="color:#a6e22e">b</span><span style="color:#f92672">%</span><span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">a</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n(n+\log U))$，其中 $n$ 为 $\textit{nums}$ 的长度，$U=max(\textit{nums})$。外层循环时，单看 $g=\textit{nums}[i]$，它因为求 GCD 减半的次数是 $O(\log U)$ 次，因此内层循环的时间复杂度为 $O(n+\log U)$，所以总的时间复杂度为 $O(n(n+\log U))$。</li>
+<li>空间复杂度：$O(1)$，仅用到若干变量。</li>
+</ul>
+<h1 id="方法二利用-gcd-的性质">方法二：利用 GCD 的性质</h1>
+<p>原理见我之前写的 <a href="https://leetcode.cn/problems/smallest-subarrays-with-maximum-bitwise-or/solution/by-endlesscheng-zai1/">这篇题解的方法二</a>，<a href="https://www.bilibili.com/video/BV1ne4y1e7nu">视频讲解</a> 详细介绍了这种算法的原理。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">subarrayGCD</span>(self, nums: List[int], k: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> []  <span style="color:#75715e"># [GCD，相同 GCD 区间的右端点]</span>
+</span></span><span style="display:flex;"><span>        i0 <span style="color:#f92672">=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, x <span style="color:#f92672">in</span> enumerate(nums):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> x <span style="color:#f92672">%</span> k:  <span style="color:#75715e"># 保证后续求的 GCD 都是 k 的倍数</span>
+</span></span><span style="display:flex;"><span>                a <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>                i0 <span style="color:#f92672">=</span> i
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>            a<span style="color:#f92672">.</span>append([x, i])
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e"># 原地去重，因为相同的 GCD 都相邻在一起</span>
+</span></span><span style="display:flex;"><span>            j <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> p <span style="color:#f92672">in</span> a:
+</span></span><span style="display:flex;"><span>                p[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> gcd(p[<span style="color:#ae81ff">0</span>], x)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> a[j][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">!=</span> p[<span style="color:#ae81ff">0</span>]:
+</span></span><span style="display:flex;"><span>                    j <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                    a[j] <span style="color:#f92672">=</span> p
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">else</span>:
+</span></span><span style="display:flex;"><span>                    a[j][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> p[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">del</span> a[j <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>:]
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> a[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">==</span> k:  <span style="color:#75715e"># a[0][0] &gt;= k</span>
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">+=</span> a[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">1</span>] <span style="color:#f92672">-</span> i0
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">subarrayGCD</span>(<span style="color:#a6e22e">nums</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">ans</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">result</span> <span style="color:#66d9ef">struct</span>{ <span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span> }
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">a</span> []<span style="color:#a6e22e">result</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">i0</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">v</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">v</span><span style="color:#f92672">%</span><span style="color:#a6e22e">k</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">a</span> = <span style="color:#66d9ef">nil</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">i0</span> = <span style="color:#a6e22e">i</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">j</span>, <span style="color:#a6e22e">p</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">v</span> = <span style="color:#a6e22e">gcd</span>(<span style="color:#a6e22e">p</span>.<span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">v</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = append(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">result</span>{<span style="color:#a6e22e">v</span>, <span style="color:#a6e22e">i</span>})
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">q</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">1</span>:] {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">v</span> <span style="color:#f92672">!=</span> <span style="color:#a6e22e">q</span>.<span style="color:#a6e22e">v</span> {
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">j</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">q</span>
+</span></span><span style="display:flex;"><span>			} <span style="color:#66d9ef">else</span> {
+</span></span><span style="display:flex;"><span>				<span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">i</span> = <span style="color:#a6e22e">q</span>.<span style="color:#a6e22e">i</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = <span style="color:#a6e22e">a</span>[:<span style="color:#a6e22e">j</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">v</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">k</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">ans</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">a</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">i</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">i0</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">gcd</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">a</span> <span style="color:#f92672">!=</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> = <span style="color:#a6e22e">b</span><span style="color:#f92672">%</span><span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">a</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析-1">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n\log U)$，其中 $n$ 为 $\textit{nums}$ 的长度，$U=max(\textit{nums})$。单看每个元素，它因为求 GCD 减半的次数是 $O(\log U)$ 次，并且每次去重的时间复杂度也为 $O(\log U)$，因此时间复杂度为 $O(n\log U)$。</li>
+<li>空间复杂度：$O(\log U)$。</li>
+</ul>
+<h4 id="相似题目">相似题目</h4>
+<ul>
+<li><a href="https://codeforces.com/problemset/problem/475/D">Codeforces 475D. CGCDSSQ</a></li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

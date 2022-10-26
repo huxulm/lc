@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/by-endlesscheng-3r0d/" />
+    <title>模拟 &#43; 计算区间交集</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>模拟 &#43; 计算区间交集</h1>
+        <div>
+                <time>September 18, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/count-days-spent-together">原题 2409.统计共同度过的日子数</a>
+<a href="https://www.bilibili.com/video/BV1MT411u7fW">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场双周赛的看法~</p>
+</blockquote>
+<hr>
+<p>题目本质上是求两个区间的交集区间。</p>
+<p>交集区间的右端点等于两个区间右端点的最小值，左端点等于两个区间左端点的最大值。</p>
+<p>注意交集区间为空的情况。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>DAYS_SUM <span style="color:#f92672">=</span> list(accumulate((<span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>), initial<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calc_days</span>(date: str) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> DAYS_SUM[int(date[:<span style="color:#ae81ff">2</span>]) <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">+</span> int(date[<span style="color:#ae81ff">3</span>:])
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">countDaysTogether</span>(self, arriveAlice: str, leaveAlice: str, arriveBob: str, leaveBob: str) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> max(calc_days(min(leaveAlice, leaveBob)) <span style="color:#f92672">-</span> calc_days(max(arriveAlice, arriveBob)) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">days</span> = []<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">28</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>, <span style="color:#ae81ff">30</span>, <span style="color:#ae81ff">31</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">calcDays</span>(<span style="color:#a6e22e">s</span> <span style="color:#66d9ef">string</span>) (<span style="color:#a6e22e">day</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">d</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">days</span>[:<span style="color:#a6e22e">s</span>[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">15</span><span style="color:#f92672">*</span><span style="color:#ae81ff">10</span><span style="color:#f92672">+</span><span style="color:#a6e22e">s</span>[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">15</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">day</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">d</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">day</span> <span style="color:#f92672">+</span> int(<span style="color:#a6e22e">s</span>[<span style="color:#ae81ff">3</span>]<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">15</span><span style="color:#f92672">*</span><span style="color:#ae81ff">10</span><span style="color:#f92672">+</span><span style="color:#a6e22e">s</span>[<span style="color:#ae81ff">4</span>]<span style="color:#f92672">&amp;</span><span style="color:#ae81ff">15</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">countDaysTogether</span>(<span style="color:#a6e22e">arriveAlice</span>, <span style="color:#a6e22e">leaveAlice</span>, <span style="color:#a6e22e">arriveBob</span>, <span style="color:#a6e22e">leaveBob</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ans</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">calcDays</span>(<span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">leaveAlice</span>, <span style="color:#a6e22e">leaveBob</span>)) <span style="color:#f92672">-</span> <span style="color:#a6e22e">calcDays</span>(<span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">arriveAlice</span>, <span style="color:#a6e22e">arriveBob</span>)) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">ans</span> &lt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">ans</span> = <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">b</span> &lt; <span style="color:#a6e22e">a</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">string</span>) <span style="color:#66d9ef">string</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">b</span> &gt; <span style="color:#a6e22e">a</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span></code></pre></div><p>API 做法：</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">def</span> <span style="color:#a6e22e">calc_dt</span>(date: str) <span style="color:#f92672">-&gt;</span> datetime<span style="color:#f92672">.</span>datetime:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> datetime<span style="color:#f92672">.</span>datetime<span style="color:#f92672">.</span>strptime(date, <span style="color:#e6db74">&#39;%m-</span><span style="color:#e6db74">%d</span><span style="color:#e6db74">&#39;</span>)  <span style="color:#75715e"># 默认是 1900 年（平年）</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">countDaysTogether</span>(self, arriveAlice: str, leaveAlice: str, arriveBob: str, leaveBob: str) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> max((calc_dt(min(leaveAlice, leaveBob)) <span style="color:#f92672">-</span> calc_dt(max(arriveAlice, arriveBob)))<span style="color:#f92672">.</span>days <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>)
+</span></span></code></pre></div></article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

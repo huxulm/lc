@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/by-endlesscheng-9b96/" />
+    <title>数位 DP 通用模板，附题单（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>数位 DP 通用模板，附题单（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>September 25, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/rotated-digits">原题 788.旋转数字</a>
+<a href="https://www.bilibili.com/video/BV1rS4y1s721">视频讲解</a>，从 19:30 开始（基于题目 <a href="https://leetcode.cn/problems/count-special-integers/">2376. 统计特殊整数</a>）。
+讲了数位 DP 的通用模板，以及如何使用该模板秒杀相关困难题目。
+讲完题目后还讲了一些上分的训练技巧。</p>
+</blockquote>
+<hr>
+<p>根据题意，好数中不能有 $3,4,7$，且至少包含 $2,5,6,9$ 中的一个。</p>
+<p>将 $n$ 转换成字符串 $s$，定义 $f(i,\textit{hasDiff}, \textit{isLimit}, \textit{isNum})$ 表示构造从左往右第 $i$ 位及其之后数位的合法方案数，其余参数的含义为：</p>
+<ul>
+<li>$\textit{hasDiff}$ 表示前面填的数字是否包含 $2,5,6,9$（至少一个）。</li>
+<li>$\textit{isLimit}$ 表示当前是否受到了 $n$ 的约束。若为真，则第 $i$ 位填入的数字至多为 $s[i]$，否则可以是 $9$。如果在受到约束的情况下填了 $s[i]$，那么后续填入的数字仍会受到 $n$ 的约束。</li>
+<li>$\textit{isNum}$ 表示 $i$ 前面的数位是否填了数字。若为假，则当前位可以跳过（不填数字），或者要填入的数字至少为 $1$；若为真，则要填入的数字可以从 $0$ 开始。</li>
+</ul>
+<p>后面两个参数可适用于其它数位 DP 题目。</p>
+<p>枚举要填入的数字，具体实现逻辑见代码。<strong>对于本题来说，由于前导零对答案无影响，$\textit{isNum}$ 可以省略。</strong></p>
+<p>下面代码中 Java/C++/Go 只需要记忆化 $(i,\textit{hasDiff})$ 这个状态，因为：</p>
+<ol>
+<li>对于一个固定的 $(i,\textit{hasDiff})$，这个状态受到 $\textit{isLimit}$ 的约束在整个递归过程中至多会出现一次，没必要记忆化。比如 $n=1234$，当 $i=2$ 的时候，前面可以填 $10,11,12$ 等等，如果受到 $\textit{isLimit}$ 的约束，就说明前面填的是 $12$。「当 $i=2$ 的时候，前面填的是 $12$」这件事情，在整个递归中只会发生一次。</li>
+<li>另外，如果只记忆化 $(i,\textit{hasDiff})$，$\textit{dp}$ 数组的含义就变成<strong>在不受到约束时</strong>的合法方案数，所以要在 <code>!isLimit</code> 成立时才去记忆化。接着上面的例子，在前面填 $12$ 的时候，下一位填的数字不能超过 $3$，因此算出来的结果是不能套用到前面填的是 $10,11$ 这些数字上面的。</li>
+</ol>
+<h4 id="附力扣上的数位-dp-题目">附：力扣上的数位 DP 题目</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/number-of-digit-one/">233. 数字 1 的个数</a>（<a href="https://leetcode.cn/problems/number-of-digit-one/solution/by-endlesscheng-h9ua/">题解</a>）</li>
+<li><a href="https://leetcode.cn/problems/number-of-2s-in-range-lcci/">面试题 17.06. 2出现的次数</a>（<a href="https://leetcode.cn/problems/number-of-2s-in-range-lcci/solution/by-endlesscheng-x4mf/">题解</a>）</li>
+<li><a href="https://leetcode.cn/problems/non-negative-integers-without-consecutive-ones/">600. 不含连续1的非负整数</a>（<a href="https://leetcode.cn/problems/non-negative-integers-without-consecutive-ones/solution/by-endlesscheng-1egu/">题解</a>）</li>
+<li><a href="https://leetcode.cn/problems/numbers-at-most-n-given-digit-set/">902. 最大为 N 的数字组合</a>（<a href="https://www.bilibili.com/video/BV1rS4y1s721">视频讲解</a> 中讲了）</li>
+<li><a href="https://leetcode.cn/problems/numbers-with-repeated-digits/">1012. 至少有 1 位重复的数字</a>（<a href="https://leetcode.cn/problems/numbers-with-repeated-digits/solution/by-endlesscheng-c5vg/">题解</a>，包含 $\textit{isNum}$ 的用法）</li>
+<li><a href="https://leetcode.cn/problems/digit-count-in-range/">1067. 范围内的数字计数</a></li>
+<li><a href="https://leetcode.cn/problems/find-all-good-strings/">1397. 找到所有好字符串</a>（有难度，需要结合一个知名字符串算法）</li>
+</ul>
+<p>更多的题目见我的算法竞赛模板库中的 <a href="https://github.com/EndlessCheng/codeforces-go/blob/master/copypasta/dp.go#L1731">dp.go</a>（搜索 <code>数位</code>）。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>DIFFS <span style="color:#f92672">=</span> (<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">rotatedDigits</span>(self, n: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> str(n)
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">@cache</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">f</span>(i: int, has_diff: bool, is_limit: bool) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> i <span style="color:#f92672">==</span> len(s):
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">return</span> has_diff  <span style="color:#75715e"># 只有包含 2/5/6/9 才算一个好数</span>
+</span></span><span style="display:flex;"><span>            res <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>            up <span style="color:#f92672">=</span> int(s[i]) <span style="color:#66d9ef">if</span> is_limit <span style="color:#66d9ef">else</span> <span style="color:#ae81ff">9</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> d <span style="color:#f92672">in</span> range(<span style="color:#ae81ff">0</span>, up <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>):  <span style="color:#75715e"># 枚举要填入的数字 d</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> DIFFS[d] <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>:  <span style="color:#75715e"># d 不是 3/4/7</span>
+</span></span><span style="display:flex;"><span>                    res <span style="color:#f92672">+=</span> f(i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, has_diff <span style="color:#f92672">or</span> DIFFS[d], is_limit <span style="color:#f92672">and</span> d <span style="color:#f92672">==</span> up)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> res
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f(<span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">False</span>, <span style="color:#66d9ef">True</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> DIFFS <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>0<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> 1<span style="color:#f92672">,</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">,</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">,</span> 1<span style="color:#f92672">,</span> 1<span style="color:#f92672">,</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> 1<span style="color:#f92672">};</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">char</span> s<span style="color:#f92672">[];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> dp<span style="color:#f92672">[][];</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">rotatedDigits</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> n<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">toString</span><span style="color:#f92672">(</span>n<span style="color:#f92672">).</span><span style="color:#a6e22e">toCharArray</span><span style="color:#f92672">();</span>
+</span></span><span style="display:flex;"><span>        var m <span style="color:#f92672">=</span> s<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        dp <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>m<span style="color:#f92672">][</span>2<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> m<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">fill</span><span style="color:#f92672">(</span>dp<span style="color:#f92672">[</span>i<span style="color:#f92672">],</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f<span style="color:#f92672">(</span>0<span style="color:#f92672">,</span> 0<span style="color:#f92672">,</span> <span style="color:#66d9ef">true</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">f</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> i<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> hasDiff<span style="color:#f92672">,</span> <span style="color:#66d9ef">boolean</span> isLimit<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>i <span style="color:#f92672">==</span> s<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">)</span> <span style="color:#66d9ef">return</span> hasDiff<span style="color:#f92672">;</span> <span style="color:#75715e">// 只有包含 2/5/6/9 才算一个好数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>isLimit <span style="color:#f92672">&amp;&amp;</span> dp<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>hasDiff<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;=</span> 0<span style="color:#f92672">)</span> <span style="color:#66d9ef">return</span> dp<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>hasDiff<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        var res <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        var up <span style="color:#f92672">=</span> isLimit <span style="color:#f92672">?</span> s<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> <span style="color:#e6db74">&#39;0&#39;</span> <span style="color:#f92672">:</span> 9<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var d <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> d <span style="color:#f92672">&lt;=</span> up<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>d<span style="color:#f92672">)</span> <span style="color:#75715e">// 枚举要填入的数字 d
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>DIFFS<span style="color:#f92672">[</span>d<span style="color:#f92672">]</span> <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">)</span> <span style="color:#75715e">// d 不是 3/4/7
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                res <span style="color:#f92672">+=</span> f<span style="color:#f92672">(</span>i <span style="color:#f92672">+</span> 1<span style="color:#f92672">,</span> hasDiff <span style="color:#f92672">|</span> DIFFS<span style="color:#f92672">[</span>d<span style="color:#f92672">],</span> isLimit <span style="color:#f92672">&amp;&amp;</span> d <span style="color:#f92672">==</span> up<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(!</span>isLimit<span style="color:#f92672">)</span> dp<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>hasDiff<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> res<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> res<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">int</span> diffs[<span style="color:#ae81ff">10</span>] <span style="color:#f92672">=</span> {<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> rotatedDigits(<span style="color:#66d9ef">int</span> n) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">auto</span> s <span style="color:#f92672">=</span> to_string(n);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> m <span style="color:#f92672">=</span> s.length(), dp[m][<span style="color:#ae81ff">2</span>];
+</span></span><span style="display:flex;"><span>        memset(dp, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#66d9ef">sizeof</span>(dp));
+</span></span><span style="display:flex;"><span>        function<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>(<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">bool</span>, <span style="color:#66d9ef">bool</span>)<span style="color:#f92672">&gt;</span> f <span style="color:#f92672">=</span> [<span style="color:#f92672">&amp;</span>](<span style="color:#66d9ef">int</span> i, <span style="color:#66d9ef">bool</span> has_diff, <span style="color:#66d9ef">bool</span> is_limit) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (i <span style="color:#f92672">==</span> m) <span style="color:#66d9ef">return</span> has_diff; <span style="color:#75715e">// 只有包含 2/5/6/9 才算一个好数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>is_limit <span style="color:#f92672">&amp;&amp;</span> dp[i][has_diff] <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span>) <span style="color:#66d9ef">return</span> dp[i][has_diff];
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> res <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> up <span style="color:#f92672">=</span> is_limit <span style="color:#f92672">?</span> s[i] <span style="color:#f92672">-</span> <span style="color:#e6db74">&#39;0&#39;</span> <span style="color:#f92672">:</span> <span style="color:#ae81ff">9</span>;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> d <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; d <span style="color:#f92672">&lt;=</span> up; <span style="color:#f92672">++</span>d) <span style="color:#75715e">// 枚举要填入的数字 d
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span> (diffs[d] <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>) <span style="color:#75715e">// d 不是 3/4/7
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    res <span style="color:#f92672">+=</span> f(i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, has_diff <span style="color:#f92672">||</span> diffs[d], is_limit <span style="color:#f92672">&amp;&amp;</span> d <span style="color:#f92672">==</span> up);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> (<span style="color:#f92672">!</span>is_limit) dp[i][has_diff] <span style="color:#f92672">=</span> res;
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> res;
+</span></span><span style="display:flex;"><span>        };
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>(<span style="color:#ae81ff">0</span>, false, true);
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">var</span> <span style="color:#a6e22e">diffs</span> = [<span style="color:#ae81ff">10</span>]<span style="color:#66d9ef">int</span>{<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">rotatedDigits</span>(<span style="color:#a6e22e">n</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">strconv</span>.<span style="color:#a6e22e">Itoa</span>(<span style="color:#a6e22e">n</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">m</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">s</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">dp</span> <span style="color:#f92672">:=</span> make([][<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">m</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">dp</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">i</span>] = [<span style="color:#ae81ff">2</span>]<span style="color:#66d9ef">int</span>{<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">f</span> <span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">int</span>, <span style="color:#66d9ef">bool</span>) <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span> = <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">isDiff</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">isLimit</span> <span style="color:#66d9ef">bool</span>) (<span style="color:#a6e22e">res</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">m</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">isDiff</span> <span style="color:#75715e">// 只有包含 2/5/6/9 才算一个好数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> !<span style="color:#a6e22e">isLimit</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">dv</span> <span style="color:#f92672">:=</span> <span style="color:#f92672">&amp;</span><span style="color:#a6e22e">dp</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">isDiff</span>]
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">dv</span> <span style="color:#f92672">&gt;=</span> <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>				<span style="color:#66d9ef">return</span> <span style="color:#f92672">*</span><span style="color:#a6e22e">dv</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">defer</span> <span style="color:#66d9ef">func</span>() { <span style="color:#f92672">*</span><span style="color:#a6e22e">dv</span> = <span style="color:#a6e22e">res</span> }()
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">up</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">9</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">isLimit</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">up</span> = int(<span style="color:#a6e22e">s</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">-</span> <span style="color:#e6db74">&#39;0&#39;</span>)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>; <span style="color:#a6e22e">d</span> <span style="color:#f92672">&lt;=</span> <span style="color:#a6e22e">up</span>; <span style="color:#a6e22e">d</span><span style="color:#f92672">++</span> { <span style="color:#75715e">// 枚举要填入的数字 d
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">diffs</span>[<span style="color:#a6e22e">d</span>] <span style="color:#f92672">!=</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> { <span style="color:#75715e">// d 不是 3/4/7
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#a6e22e">res</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">f</span>(<span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>, <span style="color:#a6e22e">isDiff</span>|<span style="color:#a6e22e">diffs</span>[<span style="color:#a6e22e">d</span>], <span style="color:#a6e22e">isLimit</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">d</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">up</span>)
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">true</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(\log n)$。</li>
+<li>空间复杂度：$O(\log n)$。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

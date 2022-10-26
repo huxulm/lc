@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/liang-zhang-tu-miao-dong-dan-diao-dui-li-9fvh/" />
+    <title>两张图秒懂单调队列（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>两张图秒懂单调队列（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>October 25, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/shortest-subarray-with-sum-at-least-k">原题 862.和至少为 K 的最短子数组</a></p>
+</blockquote>
+<h4 id="前置知识前缀和">前置知识：前缀和</h4>
+<p>定义前缀和 $\textit{s}[0]=0$，$\textit{s}[i+1] = \sum\limits_{j=0}^{i}\textit{nums}[j]$。</p>
+<p>例如 $\textit{nums}=[1,2,-1,2]$，对应的前缀和数组为 $s=[0,1,3,2,4]$。</p>
+<p>通过前缀和，我们可以把<strong>子数组的和转换成两个前缀和的差</strong>，即</p>
+<p>$$
+\sum_{j=\textit{left}}^{\textit{right}}\textit{nums}[j] = \sum\limits_{j=0}^{\textit{right}}\textit{nums}[j] - \sum\limits_{j=0}^{\textit{left}-1}\textit{nums}[j] = \textit{s}[\textit{right}+1] - \textit{s}[\textit{left}]
+$$</p>
+<p>例如 $\textit{nums}$ 的子数组 $[2,-1,2]$ 的和就可以用 $s[4]-s[1]=4-1=3$ 算出来。</p>
+<blockquote>
+<p>注：为方便计算，常用左闭右开区间 $[\textit{left},\textit{right})$ 来表示子数组，此时子数组的和为 $\textit{s}[\textit{right}] - \textit{s}[\textit{left}]$，子数组的长度为 $\textit{right}-\textit{left}$。</p>
+</blockquote>
+<hr>
+<p>求出 $\textit{nums}$ 的前缀和 $s$ 后，我们可以写一个暴力算法，枚举所有满足 $i&gt;j$ 且 $s[i]-s[j]\ge k$ 的子数组 $[j,i)$，取其中最小的 $i-j$ 作为答案。</p>
+<p>但这个暴力算法是 $O(n^2)$ 的，如何优化呢？</p>
+<p>我们可以遍历 $s$，同时用某个合适的数据结构来维护遍历过的 $s[i]$，并<strong>及时移除无用的 $s[i]$</strong>。</p>
+<p>优化一：</p>
+<p><img src="https://pic.leetcode.cn/1666668814-ikkWBN-862-1-2.png" alt="862-1-2.png"></p>
+<p>优化二：</p>
+<p><img src="https://pic.leetcode.cn/1666669250-KypIVI-862-2-3.png" alt="862-2-3.png"></p>
+<p>做完这两个优化后，再把 $s[i]$ 加到这个数据结构中。</p>
+<p>由于优化二保证了数据结构中的 $s[i]$ 会形成一个递增的序列，因此优化一移除的是序列最左侧的若干元素，优化二移除的是序列最右侧的若干元素。我们需要一个数据结构，它支持移除最左端的元素和最右端的元素，以及在最右端添加元素，故选用<strong>双端队列</strong>。</p>
+<blockquote>
+<p>注：由于双端队列的元素始终保持单调递增，因此这种数据结构也叫做<strong>单调队列</strong>。</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">shortestSubarray</span>(self, nums: List[int], k: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> inf
+</span></span><span style="display:flex;"><span>        s <span style="color:#f92672">=</span> list(accumulate(nums, initial<span style="color:#f92672">=</span><span style="color:#ae81ff">0</span>))  <span style="color:#75715e"># 计算前缀和</span>
+</span></span><span style="display:flex;"><span>        q <span style="color:#f92672">=</span> deque()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, cur_s <span style="color:#f92672">in</span> enumerate(s):
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> q <span style="color:#f92672">and</span> cur_s <span style="color:#f92672">-</span> s[q[<span style="color:#ae81ff">0</span>]] <span style="color:#f92672">&gt;=</span> k:
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> min(ans, i <span style="color:#f92672">-</span> q<span style="color:#f92672">.</span>popleft())  <span style="color:#75715e"># 优化一</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> q <span style="color:#f92672">and</span> s[q[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]] <span style="color:#f92672">&gt;=</span> cur_s:
+</span></span><span style="display:flex;"><span>                q<span style="color:#f92672">.</span>pop()  <span style="color:#75715e"># 优化二</span>
+</span></span><span style="display:flex;"><span>            q<span style="color:#f92672">.</span>append(i)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#66d9ef">if</span> ans <span style="color:#f92672">&lt;</span> inf <span style="color:#66d9ef">else</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">shortestSubarray</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> nums<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> k<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> nums<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">,</span> ans <span style="color:#f92672">=</span> n <span style="color:#f92672">+</span> 1<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        var s <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">long</span><span style="color:#f92672">[</span>n <span style="color:#f92672">+</span> 1<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> n<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            s<span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> s<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">+</span> nums<span style="color:#f92672">[</span>i<span style="color:#f92672">];</span> <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        var q <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayDeque<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;();</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;=</span> n<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            var curS <span style="color:#f92672">=</span> s<span style="color:#f92672">[</span>i<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">(!</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">isEmpty</span><span style="color:#f92672">()</span> <span style="color:#f92672">&amp;&amp;</span> curS <span style="color:#f92672">-</span> s<span style="color:#f92672">[</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">peekFirst</span><span style="color:#f92672">()]</span> <span style="color:#f92672">&gt;=</span> k<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> Math<span style="color:#f92672">.</span><span style="color:#a6e22e">min</span><span style="color:#f92672">(</span>ans<span style="color:#f92672">,</span> i <span style="color:#f92672">-</span> q<span style="color:#f92672">.</span><span style="color:#a6e22e">pollFirst</span><span style="color:#f92672">());</span> <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">(!</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">isEmpty</span><span style="color:#f92672">()</span> <span style="color:#f92672">&amp;&amp;</span> s<span style="color:#f92672">[</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">peekLast</span><span style="color:#f92672">()]</span> <span style="color:#f92672">&gt;=</span> curS<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>                q<span style="color:#f92672">.</span><span style="color:#a6e22e">pollLast</span><span style="color:#f92672">();</span> <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            q<span style="color:#f92672">.</span><span style="color:#a6e22e">addLast</span><span style="color:#f92672">(</span>i<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#f92672">&gt;</span> n <span style="color:#f92672">?</span> <span style="color:#f92672">-</span>1 <span style="color:#f92672">:</span> ans<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> shortestSubarray(vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>nums, <span style="color:#66d9ef">int</span> k) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> nums.size(), ans <span style="color:#f92672">=</span> n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> s[n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>        s[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0L</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n; <span style="color:#f92672">++</span>i)
+</span></span><span style="display:flex;"><span>            s[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> s[i] <span style="color:#f92672">+</span> nums[i]; <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        deque<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> q;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;=</span> n; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">long</span> cur_s <span style="color:#f92672">=</span> s[i];
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>q.empty() <span style="color:#f92672">&amp;&amp;</span> cur_s <span style="color:#f92672">-</span> s[q.front()] <span style="color:#f92672">&gt;=</span> k) {
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> min(ans, i <span style="color:#f92672">-</span> q.front());
+</span></span><span style="display:flex;"><span>                q.pop_front(); <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>q.empty() <span style="color:#f92672">&amp;&amp;</span> s[q.back()] <span style="color:#f92672">&gt;=</span> cur_s)
+</span></span><span style="display:flex;"><span>                q.pop_back(); <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            q.push_back(i);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#f92672">&gt;</span> n <span style="color:#f92672">?</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> ans;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">shortestSubarray</span>(<span style="color:#a6e22e">nums</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">nums</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">s</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">s</span>[<span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] = <span style="color:#a6e22e">s</span>[<span style="color:#a6e22e">i</span>] <span style="color:#f92672">+</span> <span style="color:#a6e22e">x</span> <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ans</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">q</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">curS</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">s</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> len(<span style="color:#a6e22e">q</span>) &gt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">curS</span><span style="color:#f92672">-</span><span style="color:#a6e22e">s</span>[<span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>]] <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">k</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ans</span> = <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">ans</span>, <span style="color:#a6e22e">i</span><span style="color:#f92672">-</span><span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>])
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">q</span> = <span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">1</span>:] <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> len(<span style="color:#a6e22e">q</span>) &gt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">s</span>[<span style="color:#a6e22e">q</span>[len(<span style="color:#a6e22e">q</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]] <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">curS</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">q</span> = <span style="color:#a6e22e">q</span>[:len(<span style="color:#a6e22e">q</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">q</span> = append(<span style="color:#a6e22e">q</span>, <span style="color:#a6e22e">i</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">ans</span> &gt; <span style="color:#a6e22e">n</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">a</span> &gt; <span style="color:#a6e22e">b</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span></code></pre></div><p>另一种写法是，在计算前缀和的同时去计算答案，这需要在双端队列中额外存储前缀和的值。</p>
+<p>由于前缀和的初始值 $0$ 在遍历 $\textit{nums}$ 之前就算出来了，因此需要在遍历之前，往双端队列中插入前缀和 $0$ 及其下标 $-1$。</p>
+<blockquote>
+<p>注 1：为什么是 $-1$？因为上面遍历的是 $\textit{s}$，下面遍历的是 $\textit{nums}$，这两者的下标偏移了一位。
+注 2：该写法在 $\textit{nums}$ 是一个<strong>流</strong>的时候也适用。</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">shortestSubarray</span>(self, nums: List[int], k: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> inf
+</span></span><span style="display:flex;"><span>        cur_s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        q <span style="color:#f92672">=</span> deque([(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>)])
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, x <span style="color:#f92672">in</span> enumerate(nums):
+</span></span><span style="display:flex;"><span>            cur_s <span style="color:#f92672">+=</span> x  <span style="color:#75715e"># 计算前缀和</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> q <span style="color:#f92672">and</span> cur_s <span style="color:#f92672">-</span> q[<span style="color:#ae81ff">0</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&gt;=</span> k:
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> min(ans, i <span style="color:#f92672">-</span> q<span style="color:#f92672">.</span>popleft()[<span style="color:#ae81ff">1</span>])  <span style="color:#75715e"># 优化一</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> q <span style="color:#f92672">and</span> q[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>][<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&gt;=</span> cur_s:
+</span></span><span style="display:flex;"><span>                q<span style="color:#f92672">.</span>pop()  <span style="color:#75715e"># 优化二</span>
+</span></span><span style="display:flex;"><span>            q<span style="color:#f92672">.</span>append((cur_s, i))
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#66d9ef">if</span> ans <span style="color:#f92672">&lt;</span> inf <span style="color:#66d9ef">else</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">shortestSubarray</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> nums<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> k<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var ans <span style="color:#f92672">=</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">MAX_VALUE</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        var q <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayDeque<span style="color:#f92672">&lt;</span>Pair<span style="color:#f92672">&lt;</span>Long<span style="color:#f92672">,</span> Integer<span style="color:#f92672">&gt;&gt;();</span>
+</span></span><span style="display:flex;"><span>        q<span style="color:#f92672">.</span><span style="color:#a6e22e">addLast</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Pair<span style="color:#f92672">&lt;&gt;(</span>0L<span style="color:#f92672">,</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        var curS <span style="color:#f92672">=</span> 0L<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> nums<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            curS <span style="color:#f92672">+=</span> nums<span style="color:#f92672">[</span>i<span style="color:#f92672">];</span> <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">(!</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">isEmpty</span><span style="color:#f92672">()</span> <span style="color:#f92672">&amp;&amp;</span> curS <span style="color:#f92672">-</span> q<span style="color:#f92672">.</span><span style="color:#a6e22e">peekFirst</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getKey</span><span style="color:#f92672">()</span> <span style="color:#f92672">&gt;=</span> k<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> Math<span style="color:#f92672">.</span><span style="color:#a6e22e">min</span><span style="color:#f92672">(</span>ans<span style="color:#f92672">,</span> i <span style="color:#f92672">-</span> q<span style="color:#f92672">.</span><span style="color:#a6e22e">pollFirst</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getValue</span><span style="color:#f92672">());</span> <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span> <span style="color:#f92672">(!</span>q<span style="color:#f92672">.</span><span style="color:#a6e22e">isEmpty</span><span style="color:#f92672">()</span> <span style="color:#f92672">&amp;&amp;</span> q<span style="color:#f92672">.</span><span style="color:#a6e22e">peekLast</span><span style="color:#f92672">().</span><span style="color:#a6e22e">getKey</span><span style="color:#f92672">()</span> <span style="color:#f92672">&gt;=</span> curS<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>                q<span style="color:#f92672">.</span><span style="color:#a6e22e">pollLast</span><span style="color:#f92672">();</span> <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            q<span style="color:#f92672">.</span><span style="color:#a6e22e">addLast</span><span style="color:#f92672">(</span><span style="color:#66d9ef">new</span> Pair<span style="color:#f92672">&lt;&gt;(</span>curS<span style="color:#f92672">,</span> i<span style="color:#f92672">));</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#f92672">==</span> Integer<span style="color:#f92672">.</span><span style="color:#a6e22e">MAX_VALUE</span> <span style="color:#f92672">?</span> <span style="color:#f92672">-</span>1 <span style="color:#f92672">:</span> ans<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> shortestSubarray(vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>nums, <span style="color:#66d9ef">int</span> k) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> ans <span style="color:#f92672">=</span> INT_MAX;
+</span></span><span style="display:flex;"><span>        deque<span style="color:#f92672">&lt;</span>pair<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">long</span>, <span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> q;
+</span></span><span style="display:flex;"><span>        q.emplace_back(<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">long</span> cur_s <span style="color:#f92672">=</span> <span style="color:#ae81ff">0L</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> nums.size(); <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>            cur_s <span style="color:#f92672">+=</span> nums[i]; <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>q.empty() <span style="color:#f92672">&amp;&amp;</span> cur_s <span style="color:#f92672">-</span> q.front().first <span style="color:#f92672">&gt;=</span> k) {
+</span></span><span style="display:flex;"><span>                ans <span style="color:#f92672">=</span> min(ans, i <span style="color:#f92672">-</span> q.front().second);
+</span></span><span style="display:flex;"><span>                q.pop_front(); <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> (<span style="color:#f92672">!</span>q.empty() <span style="color:#f92672">&amp;&amp;</span> q.back().first <span style="color:#f92672">&gt;=</span> cur_s)
+</span></span><span style="display:flex;"><span>                q.pop_back(); <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            q.emplace_back(cur_s, i);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#f92672">==</span> INT_MAX <span style="color:#f92672">?</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span> <span style="color:#f92672">:</span> ans;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">shortestSubarray</span>(<span style="color:#a6e22e">nums</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">k</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">type</span> <span style="color:#a6e22e">pair</span> <span style="color:#66d9ef">struct</span>{ <span style="color:#a6e22e">s</span>, <span style="color:#a6e22e">i</span> <span style="color:#66d9ef">int</span> }
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">q</span> <span style="color:#f92672">:=</span> []<span style="color:#a6e22e">pair</span>{{<span style="color:#ae81ff">0</span>, <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>}}
+</span></span><span style="display:flex;"><span>    <span style="color:#a6e22e">ans</span>, <span style="color:#a6e22e">curS</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">MaxInt32</span>, <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">nums</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">curS</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">x</span> <span style="color:#75715e">// 计算前缀和
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">for</span> len(<span style="color:#a6e22e">q</span>) &gt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">curS</span><span style="color:#f92672">-</span><span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">s</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">k</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">ans</span> = <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">ans</span>, <span style="color:#a6e22e">i</span><span style="color:#f92672">-</span><span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>].<span style="color:#a6e22e">i</span>)
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">q</span> = <span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">1</span>:] <span style="color:#75715e">// 优化一
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> len(<span style="color:#a6e22e">q</span>) &gt; <span style="color:#ae81ff">0</span> <span style="color:#f92672">&amp;&amp;</span> <span style="color:#a6e22e">q</span>[len(<span style="color:#a6e22e">q</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>].<span style="color:#a6e22e">s</span> <span style="color:#f92672">&gt;=</span> <span style="color:#a6e22e">curS</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#a6e22e">q</span> = <span style="color:#a6e22e">q</span>[:len(<span style="color:#a6e22e">q</span>)<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#75715e">// 优化二
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#a6e22e">q</span> = append(<span style="color:#a6e22e">q</span>, <span style="color:#a6e22e">pair</span>{<span style="color:#a6e22e">curS</span>, <span style="color:#a6e22e">i</span>})
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">ans</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">math</span>.<span style="color:#a6e22e">MaxInt32</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> <span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">min</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">a</span> &gt; <span style="color:#a6e22e">b</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n)$。虽然我们写了个二重循环，但站在 $\textit{nums}[i]$ 的视角看，它在二重循环中最多入队出队各一次，因此整个二重循环的时间复杂度为 $O(n)$。</li>
+<li>空间复杂度：$O(n)$。最坏情况下单调队列中会存储 $O(n)$ 个元素。</li>
+</ul>
+<h4 id="相似题目">相似题目</h4>
+<p>如果 $\textit{nums}$ 的元素均为非负数，那么可以用双指针做，即</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/minimum-size-subarray-sum/">209. 长度最小的子数组</a>（你也可以直接把本题代码复制过去，改改也能过，区别在于双指针是 $O(1)$ 空间的）</li>
+</ul>
+<p>另外附一些单调队列/单调栈的题目。</p>
+<p>做题时，无论题目变成什么样，请记住一个核心原则：<strong>及时移除无用数据，保证队列/栈的有序性</strong>。</p>
+<p>单调队列：</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/dui-lie-de-zui-da-zhi-lcof/">面试题 59-II. 队列的最大值</a>（单调队列模板题）</li>
+<li><a href="https://leetcode.cn/problems/sliding-window-maximum/">239. 滑动窗口最大值</a></li>
+<li><a href="https://leetcode.cn/problems/longest-continuous-subarray-with-absolute-diff-less-than-or-equal-to-limit/">1438. 绝对差不超过限制的最长连续子数组</a></li>
+</ul>
+<p>单调栈：</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/next-greater-element-i/">496. 下一个更大元素 I</a>（单调栈模板题）</li>
+<li><a href="https://leetcode.cn/problems/next-greater-element-ii/">503. 下一个更大元素 II</a></li>
+<li><a href="https://leetcode.cn/problems/132-pattern/">456. 132 模式</a></li>
+<li><a href="https://leetcode.cn/problems/daily-temperatures/">739. 每日温度</a></li>
+<li><a href="https://leetcode.cn/problems/online-stock-span/">901. 股票价格跨度</a></li>
+<li><a href="https://leetcode.cn/problems/longest-well-performing-interval/">1124. 表现良好的最长时间段</a></li>
+<li><a href="https://leetcode.cn/problems/final-prices-with-a-special-discount-in-a-shop/">1475. 商品折扣后的最终价格</a></li>
+</ul>
+<p>矩形系列：</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/largest-rectangle-in-histogram/">84. 柱状图中最大的矩形</a></li>
+<li><a href="https://leetcode.cn/problems/maximal-rectangle/">85. 最大矩形</a></li>
+<li><a href="https://leetcode.cn/problems/count-submatrices-with-all-ones/">1504. 统计全 1 子矩形</a></li>
+</ul>
+<p>贡献法：</p>
+<ul>
+<li><a href="https://leetcode.cn/problems/sum-of-subarray-minimums/">907. 子数组的最小值之和</a></li>
+<li><a href="https://leetcode.cn/problems/maximum-subarray-min-product/">1856. 子数组最小乘积的最大值</a></li>
+<li><a href="https://leetcode.cn/problems/sum-of-subarray-ranges/">2104. 子数组范围和</a></li>
+<li><a href="https://leetcode.cn/problems/sum-of-total-strength-of-wizards/">2281. 巫师的总力量和</a>（关底 BOSS）</li>
+</ul>
+<hr>
+<p>欢迎关注我的B站频道：<a href="https://space.bilibili.com/206214">灵茶山艾府</a>，每周更新算法讲解视频哦~</p>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

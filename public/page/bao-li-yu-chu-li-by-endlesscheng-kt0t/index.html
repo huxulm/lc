@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/bao-li-yu-chu-li-by-endlesscheng-kt0t/" />
+    <title>暴力 / 预处理</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>暴力 / 预处理</h1>
+        <div>
+                <time>October 16, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/range-product-queries-of-powers">原题 2438.二的幂数组中查询范围内的乘积</a>
+<a href="https://www.bilibili.com/video/BV1cV4y157BY">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场双周赛的看法~</p>
+</blockquote>
+<hr>
+<h1 id="方法一暴力">方法一：暴力</h1>
+<p>拆分 $n$，把二的幂次记到一个数组 $a$ 中，对每个询问，直接遍历 $a$。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>MOD <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">productQueries</span>(self, n: int, queries: List[List[int]]) <span style="color:#f92672">-&gt;</span> List[int]:
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> n:
+</span></span><span style="display:flex;"><span>            lb <span style="color:#f92672">=</span> n <span style="color:#f92672">&amp;</span> <span style="color:#f92672">-</span>n
+</span></span><span style="display:flex;"><span>            a<span style="color:#f92672">.</span>append(lb)
+</span></span><span style="display:flex;"><span>            n <span style="color:#f92672">^=</span> lb
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> [reduce(<span style="color:#66d9ef">lambda</span> x, y: x <span style="color:#f92672">*</span> y <span style="color:#f92672">%</span> MOD, a[l: r <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>]) <span style="color:#66d9ef">for</span> l, r <span style="color:#f92672">in</span> queries]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mod</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1e9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">productQueries</span>(<span style="color:#a6e22e">n</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">queries</span> [][]<span style="color:#66d9ef">int</span>) []<span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">a</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">n</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">lb</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">&amp;</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = append(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">lb</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">n</span> ^= <span style="color:#a6e22e">lb</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ans</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, len(<span style="color:#a6e22e">queries</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">q</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">queries</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">mul</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>] : <span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">1</span>]<span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">mul</span> = <span style="color:#a6e22e">mul</span> <span style="color:#f92672">*</span> <span style="color:#a6e22e">x</span> <span style="color:#f92672">%</span> <span style="color:#a6e22e">mod</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">ans</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">mul</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(m\log n)$，其中 $m$ 为 $\textit{queries}$ 的长度。</li>
+<li>空间复杂度：$O(\log n)$。返回值不计入。</li>
+</ul>
+<h1 id="方法二预处理">方法二：预处理</h1>
+<p>注意到 $a$ 的长度很小，我们可以直接预处理所有询问。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span>MOD <span style="color:#f92672">=</span> <span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">productQueries</span>(self, n: int, queries: List[List[int]]) <span style="color:#f92672">-&gt;</span> List[int]:
+</span></span><span style="display:flex;"><span>        a <span style="color:#f92672">=</span> []
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> n:
+</span></span><span style="display:flex;"><span>            lb <span style="color:#f92672">=</span> n <span style="color:#f92672">&amp;</span> <span style="color:#f92672">-</span>n
+</span></span><span style="display:flex;"><span>            a<span style="color:#f92672">.</span>append(lb)
+</span></span><span style="display:flex;"><span>            n <span style="color:#f92672">^=</span> lb
+</span></span><span style="display:flex;"><span>        na <span style="color:#f92672">=</span> len(a)
+</span></span><span style="display:flex;"><span>        res <span style="color:#f92672">=</span> [[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> na <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(na)]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, x <span style="color:#f92672">in</span> enumerate(a):
+</span></span><span style="display:flex;"><span>            res[i][i] <span style="color:#f92672">=</span> x
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> j <span style="color:#f92672">in</span> range(i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>, na):
+</span></span><span style="display:flex;"><span>                res[i][j] <span style="color:#f92672">=</span> res[i][j <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">*</span> a[j] <span style="color:#f92672">%</span> MOD
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> [res[l][r] <span style="color:#66d9ef">for</span> l, r <span style="color:#f92672">in</span> queries]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">const</span> <span style="color:#a6e22e">mod</span> <span style="color:#66d9ef">int</span> = <span style="color:#ae81ff">1e9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">productQueries</span>(<span style="color:#a6e22e">n</span> <span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">queries</span> [][]<span style="color:#66d9ef">int</span>) []<span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">a</span> <span style="color:#f92672">:=</span> []<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">n</span> &gt; <span style="color:#ae81ff">0</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">lb</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n</span> <span style="color:#f92672">&amp;</span> <span style="color:#f92672">-</span><span style="color:#a6e22e">n</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">a</span> = append(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">lb</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">n</span> ^= <span style="color:#a6e22e">lb</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">na</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">a</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">res</span> <span style="color:#f92672">:=</span> make([][]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">na</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">a</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">i</span>] = make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">na</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">x</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>; <span style="color:#a6e22e">j</span> &lt; <span style="color:#a6e22e">na</span>; <span style="color:#a6e22e">j</span><span style="color:#f92672">++</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span>] = <span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">i</span>][<span style="color:#a6e22e">j</span><span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>] <span style="color:#f92672">*</span> <span style="color:#a6e22e">a</span>[<span style="color:#a6e22e">j</span>] <span style="color:#f92672">%</span> <span style="color:#a6e22e">mod</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ans</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, len(<span style="color:#a6e22e">queries</span>))
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">q</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">queries</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">ans</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">res</span>[<span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">0</span>]][<span style="color:#a6e22e">q</span>[<span style="color:#ae81ff">1</span>]]
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析-1">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(m + \log^2 n)$，其中 $m$ 为 $\textit{queries}$ 的长度。</li>
+<li>空间复杂度：$O(\log^2 n)$。返回值不计入。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

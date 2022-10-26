@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/s-by-endlesscheng-m0pg/" />
+    <title>双指针</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>双指针</h1>
+        <div>
+                <time>October 7, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/1GxJYY">原题 LCP 68.美观的花束</a>
+<a href="https://www.bilibili.com/video/BV1rT411P7NA">视频讲解</a> 已出炉，<strong>包括本题双指针的原理和时间复杂度分析</strong>，欢迎点赞三连，在评论区分享你对这场力扣杯的看法~</p>
+</blockquote>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">beautifulBouquet</span>(self, flowers: List[int], cnt: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> left <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>        c <span style="color:#f92672">=</span> Counter()
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> right, x <span style="color:#f92672">in</span> enumerate(flowers):
+</span></span><span style="display:flex;"><span>            c[x] <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">while</span> c[x] <span style="color:#f92672">&gt;</span> cnt:
+</span></span><span style="display:flex;"><span>                c[flowers[left]] <span style="color:#f92672">-=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>                left <span style="color:#f92672">+=</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>            ans <span style="color:#f92672">+=</span> right <span style="color:#f92672">-</span> left <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans <span style="color:#f92672">%</span> (<span style="color:#ae81ff">10</span> <span style="color:#f92672">**</span> <span style="color:#ae81ff">9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>)
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">beautifulBouquet</span>(<span style="color:#a6e22e">flowers</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">cnt</span> <span style="color:#66d9ef">int</span>) (<span style="color:#a6e22e">ans</span> <span style="color:#66d9ef">int</span>) {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">c</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">map</span>[<span style="color:#66d9ef">int</span>]<span style="color:#66d9ef">int</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">left</span> <span style="color:#f92672">:=</span> <span style="color:#ae81ff">0</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">right</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">flowers</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">c</span>[<span style="color:#a6e22e">x</span>]<span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">c</span>[<span style="color:#a6e22e">x</span>] &gt; <span style="color:#a6e22e">cnt</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">c</span>[<span style="color:#a6e22e">flowers</span>[<span style="color:#a6e22e">left</span>]]<span style="color:#f92672">--</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">left</span><span style="color:#f92672">++</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">ans</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">right</span> <span style="color:#f92672">-</span> <span style="color:#a6e22e">left</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span> <span style="color:#f92672">%</span> (<span style="color:#ae81ff">1e9</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">7</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div></article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

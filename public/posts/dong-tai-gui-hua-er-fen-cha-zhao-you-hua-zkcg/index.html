@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/posts/dong-tai-gui-hua-er-fen-cha-zhao-you-hua-zkcg/" />
+    <title>动态规划 &#43; 二分查找优化（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>动态规划 &#43; 二分查找优化（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>October 21, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/maximum-profit-in-job-scheduling">原题 1235.规划兼职工作</a></p>
+</blockquote>
+<h4 id="提示-1">提示 1</h4>
+<p>将工作按照结束时间排序，以示例 2 为例，得到下图：</p>
+<p><img src="https://pic.leetcode.cn/1666245025-aURzDO-20221020.drawio%20(4).png" alt=""></p>
+<p>手动计算一下，按照结束时间排序后：</p>
+<ul>
+<li>前 $1$ 个工作的最大报酬为 $20$；</li>
+<li>前 $2$ 个工作的最大报酬为 $20$；</li>
+<li>前 $3$ 个工作的最大报酬为前 $1$ 个工作的最大报酬 $+70=20+70=90$；</li>
+<li>前 $4$ 个工作的最大报酬为前 $3$ 个工作的最大报酬 $+60=90+60=150$；</li>
+<li>前 $5$ 个工作的最大报酬，如果选了第 $5$ 个工作，那么报酬为前 $1$ 个工作的最大报酬 $+100=20+100=120$；但也可以不选第 $5$ 个工作，报酬为前 $4$ 个工作的最大报酬，即 $150$。由于 $150&gt;120$，不选第 $5$ 个工作更好，因此前 $5$ 个工作的最大报酬为 $150$。</li>
+</ul>
+<p>示例 2 等价于计算前 $5$ 个工作的最大报酬，即 $150$。</p>
+<h4 id="提示-2">提示 2</h4>
+<p>总结一下，我们可以分类讨论，求出按照结束时间排序后的<strong>前</strong> $i$ 个工作的最大报酬：</p>
+<ul>
+<li>不选<strong>第</strong> $i$ 个工作，那么最大报酬等于<strong>前</strong> $i-1$ 个工作的最大报酬（转换成了一个规模更小的子问题）；</li>
+<li>选<strong>第</strong> $i$ 个工作，由于工作时间不能重叠，设 $j$ 是最大的满足 $\textit{endTime}[j]\le\textit{startTime}[i]$ 的 $j$，那么最大报酬等于<strong>前</strong> $j$ 个工作的最大报酬加上 $\textit{profit}[i]$（同样转换成了一个规模更小的子问题）；</li>
+<li>这两种决策取最大值。</li>
+</ul>
+<blockquote>
+<p>注：由于按照结束时间排序，<strong>前</strong> $j$ 个工作中的任意一个都不会与<strong>第</strong> $i$ 个工作的时间重叠。</p>
+</blockquote>
+<h4 id="提示-3">提示 3</h4>
+<p>怎么实现？</p>
+<p>上述思路是一个标准的关于<strong>递推</strong>的描述，定义 $f[i]$ 表示按照结束时间排序后的<strong>前</strong> $i$ 个工作的最大报酬，分类讨论：</p>
+<ul>
+<li>不选<strong>第</strong> $i$ 个工作：$f[i] = f[i-1]$；</li>
+<li>选<strong>第</strong> $i$ 个工作：$f[i] = f[j]+\textit{profit}[i]$，其中 $j$ 是最大的满足 $\textit{endTime}[j]\le\textit{startTime}[i]$ 的 $j$，不存在时为 $-1$。</li>
+</ul>
+<p>两者取最大值，即</p>
+<p>$$
+f[i] = \max(f[i-1], f[j]+\textit{profit}[i])
+$$</p>
+<p>代码实现时，为避免处理 $-1$，可将与 $f$ 有关的下标都 $+1$，即</p>
+<p>$$
+f[i+1] = \max(f[i], f[j+1]+\textit{profit}[i])
+$$</p>
+<p>初始项 $f[0]=0$，答案为 $f[n]$。</p>
+<p>代码实现时，由于结束时间是有序的，$j$ 可以用二分查找计算出来。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">jobScheduling</span>(self, startTime: List[int], endTime: List[int], profit: List[int]) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        jobs <span style="color:#f92672">=</span> sorted(zip(endTime, startTime, profit))  <span style="color:#75715e"># 按照结束时间排序</span>
+</span></span><span style="display:flex;"><span>        f <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0</span>] <span style="color:#f92672">*</span> (len(jobs) <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> i, (_, st, p) <span style="color:#f92672">in</span> enumerate(jobs):
+</span></span><span style="display:flex;"><span>            j <span style="color:#f92672">=</span> bisect_right(jobs, (st, inf), hi<span style="color:#f92672">=</span>i)  <span style="color:#75715e"># hi=i 表示二分上界为 i（默认为 n）</span>
+</span></span><span style="display:flex;"><span>            f[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> max(f[i], f[j] <span style="color:#f92672">+</span> p)  <span style="color:#75715e"># 为什么是 j 不是 j+1：上面算的是 &gt; st，-1 后得到 &lt;= st，但由于还要 +1，抵消了</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f[<span style="color:#f92672">-</span><span style="color:#ae81ff">1</span>]
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">jobScheduling</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> startTime<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> endTime<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> profit<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var n <span style="color:#f92672">=</span> startTime<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        var jobs <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>n<span style="color:#f92672">][];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> n<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span>
+</span></span><span style="display:flex;"><span>            jobs<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[]{</span>startTime<span style="color:#f92672">[</span>i<span style="color:#f92672">],</span> endTime<span style="color:#f92672">[</span>i<span style="color:#f92672">],</span> profit<span style="color:#f92672">[</span>i<span style="color:#f92672">]};</span>
+</span></span><span style="display:flex;"><span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">sort</span><span style="color:#f92672">(</span>jobs<span style="color:#f92672">,</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">,</span> b<span style="color:#f92672">)</span> <span style="color:#f92672">-&gt;</span> a<span style="color:#f92672">[</span>1<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> b<span style="color:#f92672">[</span>1<span style="color:#f92672">]);</span> <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        var f <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>n <span style="color:#f92672">+</span> 1<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> n<span style="color:#f92672">;</span> <span style="color:#f92672">++</span>i<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            var j <span style="color:#f92672">=</span> search<span style="color:#f92672">(</span>jobs<span style="color:#f92672">,</span> i<span style="color:#f92672">,</span> jobs<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>0<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>            f<span style="color:#f92672">[</span>i <span style="color:#f92672">+</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> Math<span style="color:#f92672">.</span><span style="color:#a6e22e">max</span><span style="color:#f92672">(</span>f<span style="color:#f92672">[</span>i<span style="color:#f92672">],</span> f<span style="color:#f92672">[</span>j <span style="color:#f92672">+</span> 1<span style="color:#f92672">]</span> <span style="color:#f92672">+</span> jobs<span style="color:#f92672">[</span>i<span style="color:#f92672">][</span>2<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f<span style="color:#f92672">[</span>n<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#75715e">// 返回 endTime &lt;= upper 的最大下标
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>    <span style="color:#66d9ef">private</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">search</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> jobs<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> right<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> upper<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var left <span style="color:#f92672">=</span> <span style="color:#f92672">-</span>1<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">while</span> <span style="color:#f92672">(</span>left <span style="color:#f92672">+</span> 1 <span style="color:#f92672">&lt;</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            var mid <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>left <span style="color:#f92672">+</span> right<span style="color:#f92672">)</span> <span style="color:#f92672">/</span> 2<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>jobs<span style="color:#f92672">[</span>mid<span style="color:#f92672">][</span>1<span style="color:#f92672">]</span> <span style="color:#f92672">&lt;=</span> upper<span style="color:#f92672">)</span> left <span style="color:#f92672">=</span> mid<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">else</span> right <span style="color:#f92672">=</span> mid<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> left<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> jobScheduling(vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>startTime, vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>endTime, vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>profit) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> startTime.size();
+</span></span><span style="display:flex;"><span>        array<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#ae81ff">3</span><span style="color:#f92672">&gt;</span> jobs[n];
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n; <span style="color:#f92672">++</span>i)
+</span></span><span style="display:flex;"><span>            jobs[i] <span style="color:#f92672">=</span> {endTime[i], startTime[i], profit[i]};
+</span></span><span style="display:flex;"><span>        sort(jobs, jobs <span style="color:#f92672">+</span> n, [](<span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>a, <span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>b) { <span style="color:#66d9ef">return</span> a[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">&lt;</span> b[<span style="color:#ae81ff">0</span>]; }); <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> f[n <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>        f[<span style="color:#ae81ff">0</span>] <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> n; <span style="color:#f92672">++</span>i) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> j <span style="color:#f92672">=</span> upper_bound(jobs, jobs <span style="color:#f92672">+</span> i, array<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>, <span style="color:#ae81ff">3</span><span style="color:#f92672">&gt;</span>{jobs[i][<span style="color:#ae81ff">1</span>], INT_MAX}) <span style="color:#f92672">-</span> jobs;
+</span></span><span style="display:flex;"><span>            <span style="color:#75715e">// 为什么是 j 不是 j+1：上面算的是 &gt; 开始时间，-1 后得到 &lt;= 开始时间，但由于还要 +1，抵消了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            f[i <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> max(f[i], f[j] <span style="color:#f92672">+</span> jobs[i][<span style="color:#ae81ff">2</span>]);
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> f[n];
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">jobScheduling</span>(<span style="color:#a6e22e">startTime</span>, <span style="color:#a6e22e">endTime</span>, <span style="color:#a6e22e">profit</span> []<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">startTime</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">type</span> <span style="color:#a6e22e">job</span> <span style="color:#66d9ef">struct</span>{ <span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">end</span>, <span style="color:#a6e22e">profit</span> <span style="color:#66d9ef">int</span> }
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">jobs</span> <span style="color:#f92672">:=</span> make([]<span style="color:#a6e22e">job</span>, <span style="color:#a6e22e">n</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">start</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">startTime</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">jobs</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">job</span>{<span style="color:#a6e22e">start</span>, <span style="color:#a6e22e">endTime</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">profit</span>[<span style="color:#a6e22e">i</span>]}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Slice</span>(<span style="color:#a6e22e">jobs</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">jobs</span>[<span style="color:#a6e22e">i</span>].<span style="color:#a6e22e">end</span> &lt; <span style="color:#a6e22e">jobs</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">end</span> }) <span style="color:#75715e">// 按照结束时间排序
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">f</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">job</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">jobs</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">j</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Search</span>(<span style="color:#a6e22e">i</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">jobs</span>[<span style="color:#a6e22e">j</span>].<span style="color:#a6e22e">end</span> &gt; <span style="color:#a6e22e">job</span>.<span style="color:#a6e22e">start</span> })
+</span></span><span style="display:flex;"><span>		<span style="color:#75715e">// 为什么是 j 不是 j+1：上面算的是 &gt; start，-1 后得到 &lt;= start，但由于还要 +1，抵消了
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		<span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">i</span><span style="color:#f92672">+</span><span style="color:#ae81ff">1</span>] = <span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">i</span>], <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">j</span>]<span style="color:#f92672">+</span><span style="color:#a6e22e">job</span>.<span style="color:#a6e22e">profit</span>)
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">f</span>[<span style="color:#a6e22e">n</span>]
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">max</span>(<span style="color:#a6e22e">a</span>, <span style="color:#a6e22e">b</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">if</span> <span style="color:#a6e22e">b</span> &gt; <span style="color:#a6e22e">a</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">b</span> }; <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">a</span> }
+</span></span></code></pre></div><h4 id="编程小课堂--标准库二分的灵活运用">编程小课堂 · 标准库二分的灵活运用</h4>
+<p>在写二分题目时，经常会遇到形如「在有序数组中查询大于某个数的最小数」这类问题。具体来说有四类：</p>
+<ul>
+<li>$\ge$：在有序数组中查询大于或等于某个数的最小数；</li>
+<li>$&gt;$：在有序数组中查询大于某个数的最小数；</li>
+<li>$\le$：在有序数组中查询小于或等于某个数的最大数；</li>
+<li>$&lt;$：在有序数组中查询小于某个数的最大数。</li>
+</ul>
+<p>上面的 Python/C++/Go 代码都中用到了标准库中的二分，但这些二分在设计的时候，只提供了查询 $\ge$ 和 $&gt;$ 的功能，并没有提供查询 $\le$ 和 $&lt;$ 的功能。</p>
+<p>没有关系，稍微转换下就能解决。比如查询 $&gt;$ 得到了下标 $i$，那么 $i-1$ 就是 $\le$ 的结果了（假设数组为升序），同理 $&lt;$ 可以用 $\ge$ 算出来。</p>
+<blockquote>
+<p>注：$&gt;$ 和 $\ge$ 也可以转换，对于整数来说，$&gt; x$ 等价于 $\ge x+1$。</p>
+</blockquote>
+<h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n\log n)$，其中 $n$ 为 $\textit{startTime}$ 的长度。排序的时间复杂度为 $O(n\log n)$，动态规划部分一共计算了 $n$ 次二分，时间复杂度为 $O(n\log n)$，因此总的时间复杂度为 $O(n\log n)$。</li>
+<li>空间复杂度：$O(n)$。</li>
+</ul>
+<h4 id="相似题目">相似题目</h4>
+<ul>
+<li><a href="https://leetcode.cn/problems/maximum-number-of-events-that-can-be-attended-ii/">1751. 最多可以参加的会议数目 II</a></li>
+<li><a href="https://leetcode.cn/problems/maximum-earnings-from-taxi/">2008. 出租车的最大盈利</a></li>
+</ul>
+<hr>
+<p>欢迎关注我的B站频道：<a href="https://space.bilibili.com/206214">灵茶山艾府</a>，每周更新算法讲解视频哦~</p>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>

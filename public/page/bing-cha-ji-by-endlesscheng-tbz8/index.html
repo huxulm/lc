@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <link rel="shortcut icon" href="http://example.org/favicon.ico">
+    
+    <link rel="stylesheet" href="/css/style.min.css">
+
+    <link rel="canonical" href="http://example.org/page/bing-cha-ji-by-endlesscheng-tbz8/" />
+    <title>并查集（Python/Java/C&#43;&#43;/Go）</title>
+</head>
+<body><header id="banner">
+    <h2><a href="http://example.org/">My New Hugo Site</a></h2>
+    <nav>
+        <ul>
+            
+        </ul>
+    </nav>
+</header>
+<main id="content">
+<article>
+    <header id="post-header">
+        <h1>并查集（Python/Java/C&#43;&#43;/Go）</h1>
+        <div>
+                <time>September 25, 2022</time>
+            </div>
+    </header><blockquote>
+<p><a href="https://leetcode.cn/problems/number-of-good-paths">原题 2421.好路径的数目</a>
+<a href="https://www.bilibili.com/video/BV1ve411K7P5">视频讲解</a> 已出炉，欢迎点赞三连，在评论区分享你对这场周赛的看法~</p>
+</blockquote>
+<hr>
+<h4 id="提示-1">提示 1</h4>
+<p>当涉及到最大/最小的约束时，往往要按照节点值的顺序思考。</p>
+<p>应该从大到小，还是从小到大呢？</p>
+<h4 id="提示-2">提示 2</h4>
+<p>一种比较暴力的思路是，先考虑节点值最大的这些点，设有 $x$ 个，那么会形成 $C(x,2) = \dfrac{x(x-1)}{2}$ 条长度大于 $1$ 的好路径。</p>
+<p>然后从树中删去这些点，再递归考虑剩下的各个连通块内的好路径个数。</p>
+<p>但这样每个节点会被多次统计，最坏情况下时间复杂度为 $O(n^2)$。</p>
+<h4 id="提示-3">提示 3</h4>
+<p>倒着思考这一过程，把删除改为合并，你想到了哪个数据结构？</p>
+<h4 id="提示-4">提示 4</h4>
+<p>并查集。</p>
+<h4 id="提示-5">提示 5</h4>
+<p>按节点值从小到大考虑，同时用并查集合并时，<strong>总是从节点值小的点往节点值大的点合并</strong>，这样可以保证连通块的代表元的节点值是最大的。</p>
+<p>对于节点 $x$ 及其邻居 $y$，如果 $y$ 所处的连通分量的最大节点值不超过 $\textit{vals}[x]$，那么可以把 $y$ 所处的连通块合并到 $x$ 所处的连通块中。</p>
+<p>如果此时这两个连通块的最大节点值相同，那么可以根据乘法原理，把这两个连通块内的等于最大节点值的节点个数相乘，加到答案中。</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-py" data-lang="py"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">numberOfGoodPaths</span>(self, vals: List[int], edges: List[List[int]]) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>        n <span style="color:#f92672">=</span> len(vals)
+</span></span><span style="display:flex;"><span>        g <span style="color:#f92672">=</span> [[] <span style="color:#66d9ef">for</span> _ <span style="color:#f92672">in</span> range(n)]
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> x, y <span style="color:#f92672">in</span> edges:
+</span></span><span style="display:flex;"><span>            g[x]<span style="color:#f92672">.</span>append(y)
+</span></span><span style="display:flex;"><span>            g[y]<span style="color:#f92672">.</span>append(x)  <span style="color:#75715e"># 建图</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># 并查集模板</span>
+</span></span><span style="display:flex;"><span>        fa <span style="color:#f92672">=</span> list(range(n))
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e"># size[x] 表示节点值等于 vals[x] 的节点个数，如果按照节点值从小到大合并，size[x] 也是连通块内的等于最大节点值的节点个数</span>
+</span></span><span style="display:flex;"><span>        size <span style="color:#f92672">=</span> [<span style="color:#ae81ff">1</span>] <span style="color:#f92672">*</span> n
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">def</span> <span style="color:#a6e22e">find</span>(x: int) <span style="color:#f92672">-&gt;</span> int:
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">if</span> fa[x] <span style="color:#f92672">!=</span> x:
+</span></span><span style="display:flex;"><span>                fa[x] <span style="color:#f92672">=</span> find(fa[x])
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">return</span> fa[x]
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        ans <span style="color:#f92672">=</span> n
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> vx, x <span style="color:#f92672">in</span> sorted(zip(vals, range(n))):
+</span></span><span style="display:flex;"><span>            fx <span style="color:#f92672">=</span> find(x)
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> y <span style="color:#f92672">in</span> g[x]:
+</span></span><span style="display:flex;"><span>                y <span style="color:#f92672">=</span> find(y)
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> y <span style="color:#f92672">==</span> fx <span style="color:#f92672">or</span> vals[y] <span style="color:#f92672">&gt;</span> vx: <span style="color:#66d9ef">continue</span>  <span style="color:#75715e"># 只考虑最大节点值比 vx 小的连通块</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> vals[y] <span style="color:#f92672">==</span> vx:  <span style="color:#75715e"># 可以构成好路径</span>
+</span></span><span style="display:flex;"><span>                    ans <span style="color:#f92672">+=</span> size[fx] <span style="color:#f92672">*</span> size[y]  <span style="color:#75715e"># 乘法原理</span>
+</span></span><span style="display:flex;"><span>                    size[fx] <span style="color:#f92672">+=</span> size[y]  <span style="color:#75715e"># 统计连通块内节点值等于 vx 的节点个数</span>
+</span></span><span style="display:flex;"><span>                fa[y] <span style="color:#f92672">=</span> fx  <span style="color:#75715e"># 把小的节点值合并到大的节点值上</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-java" data-lang="java"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> fa<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">public</span> <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">numberOfGoodPaths</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">[]</span> vals<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[][]</span> edges<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        var n <span style="color:#f92672">=</span> vals<span style="color:#f92672">.</span><span style="color:#a6e22e">length</span><span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        List<span style="color:#f92672">&lt;</span>Integer<span style="color:#f92672">&gt;[]</span> g <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">[</span>n<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">setAll</span><span style="color:#f92672">(</span>g<span style="color:#f92672">,</span> e <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">new</span> ArrayList<span style="color:#f92672">&lt;&gt;());</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var e <span style="color:#f92672">:</span> edges<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> e<span style="color:#f92672">[</span>0<span style="color:#f92672">],</span> y <span style="color:#f92672">=</span> e<span style="color:#f92672">[</span>1<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>            g<span style="color:#f92672">[</span>x<span style="color:#f92672">].</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>y<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>            g<span style="color:#f92672">[</span>y<span style="color:#f92672">].</span><span style="color:#a6e22e">add</span><span style="color:#f92672">(</span>x<span style="color:#f92672">);</span> <span style="color:#75715e">// 建图
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        fa <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>n<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var i <span style="color:#f92672">=</span> 0<span style="color:#f92672">;</span> i <span style="color:#f92672">&lt;</span> n<span style="color:#f92672">;</span> i<span style="color:#f92672">++)</span> fa<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> i<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// size[x] 表示节点值等于 vals[x] 的节点个数，如果按照节点值从小到大合并，size[x] 也是连通块内的等于最大节点值的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        var size <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">int</span><span style="color:#f92672">[</span>n<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">fill</span><span style="color:#f92672">(</span>size<span style="color:#f92672">,</span> 1<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        var id <span style="color:#f92672">=</span> IntStream<span style="color:#f92672">.</span><span style="color:#a6e22e">range</span><span style="color:#f92672">(</span>0<span style="color:#f92672">,</span> n<span style="color:#f92672">).</span><span style="color:#a6e22e">boxed</span><span style="color:#f92672">().</span><span style="color:#a6e22e">toArray</span><span style="color:#f92672">(</span>Integer<span style="color:#f92672">[]::</span><span style="color:#66d9ef">new</span><span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>        Arrays<span style="color:#f92672">.</span><span style="color:#a6e22e">sort</span><span style="color:#f92672">(</span>id<span style="color:#f92672">,</span> <span style="color:#f92672">(</span>i<span style="color:#f92672">,</span> j<span style="color:#f92672">)</span> <span style="color:#f92672">-&gt;</span> vals<span style="color:#f92672">[</span>i<span style="color:#f92672">]</span> <span style="color:#f92672">-</span> vals<span style="color:#f92672">[</span>j<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        var ans <span style="color:#f92672">=</span> n<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var x <span style="color:#f92672">:</span> id<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> vx <span style="color:#f92672">=</span> vals<span style="color:#f92672">[</span>x<span style="color:#f92672">],</span> fx <span style="color:#f92672">=</span> find<span style="color:#f92672">(</span>x<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> <span style="color:#f92672">(</span>var y <span style="color:#f92672">:</span> g<span style="color:#f92672">[</span>x<span style="color:#f92672">])</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>                y <span style="color:#f92672">=</span> find<span style="color:#f92672">(</span>y<span style="color:#f92672">);</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>y <span style="color:#f92672">==</span> fx <span style="color:#f92672">||</span> vals<span style="color:#f92672">[</span>y<span style="color:#f92672">]</span> <span style="color:#f92672">&gt;</span> vx<span style="color:#f92672">)</span> <span style="color:#66d9ef">continue</span><span style="color:#f92672">;</span> <span style="color:#75715e">// 只考虑最大节点值比 vx 小的连通块
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>vals<span style="color:#f92672">[</span>y<span style="color:#f92672">]</span> <span style="color:#f92672">==</span> vx<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> <span style="color:#75715e">// 可以构成好路径
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    ans <span style="color:#f92672">+=</span> size<span style="color:#f92672">[</span>fx<span style="color:#f92672">]</span> <span style="color:#f92672">*</span> size<span style="color:#f92672">[</span>y<span style="color:#f92672">];</span> <span style="color:#75715e">// 乘法原理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    size<span style="color:#f92672">[</span>fx<span style="color:#f92672">]</span> <span style="color:#f92672">+=</span> size<span style="color:#f92672">[</span>y<span style="color:#f92672">];</span> <span style="color:#75715e">// 统计连通块内节点值等于 vx 的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>                fa<span style="color:#f92672">[</span>y<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> fx<span style="color:#f92672">;</span> <span style="color:#75715e">// 把小的节点值合并到大的节点值上
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans<span style="color:#f92672">;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">find</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> x<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>fa<span style="color:#f92672">[</span>x<span style="color:#f92672">]</span> <span style="color:#f92672">!=</span> x<span style="color:#f92672">)</span> fa<span style="color:#f92672">[</span>x<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> find<span style="color:#f92672">(</span>fa<span style="color:#f92672">[</span>x<span style="color:#f92672">]);</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> fa<span style="color:#f92672">[</span>x<span style="color:#f92672">];</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#f92672">}</span>
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">Solution</span> {
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">public</span><span style="color:#f92672">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#66d9ef">int</span> numberOfGoodPaths(vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;</span> <span style="color:#f92672">&amp;</span>vals, vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> <span style="color:#f92672">&amp;</span>edges) {
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> n <span style="color:#f92672">=</span> vals.size();
+</span></span><span style="display:flex;"><span>        vector<span style="color:#f92672">&lt;</span>vector<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span><span style="color:#f92672">&gt;&gt;</span> g(n);
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">auto</span> <span style="color:#f92672">&amp;</span>e : edges) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> x <span style="color:#f92672">=</span> e[<span style="color:#ae81ff">0</span>], y <span style="color:#f92672">=</span> e[<span style="color:#ae81ff">1</span>];
+</span></span><span style="display:flex;"><span>            g[x].push_back(y);
+</span></span><span style="display:flex;"><span>            g[y].push_back(x); <span style="color:#75715e">// 建图
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#75715e">// 并查集模板
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#75715e">// size[x] 表示节点值等于 vals[x] 的节点个数，如果按照节点值从小到大合并，size[x] 也是连通块内的等于最大节点值的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        <span style="color:#66d9ef">int</span> id[n], fa[n], size[n]; <span style="color:#75715e">// id 后面排序用
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>        iota(id, id <span style="color:#f92672">+</span> n, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>        iota(fa, fa <span style="color:#f92672">+</span> n, <span style="color:#ae81ff">0</span>);
+</span></span><span style="display:flex;"><span>        fill(size, size <span style="color:#f92672">+</span> n, <span style="color:#ae81ff">1</span>);
+</span></span><span style="display:flex;"><span>        function<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">int</span>(<span style="color:#66d9ef">int</span>)<span style="color:#f92672">&gt;</span> find <span style="color:#f92672">=</span> [<span style="color:#f92672">&amp;</span>](<span style="color:#66d9ef">int</span> x) <span style="color:#f92672">-&gt;</span> <span style="color:#66d9ef">int</span> { <span style="color:#66d9ef">return</span> fa[x] <span style="color:#f92672">==</span> x <span style="color:#f92672">?</span> x : fa[x] <span style="color:#f92672">=</span> find(fa[x]); };
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">int</span> ans <span style="color:#f92672">=</span> n;
+</span></span><span style="display:flex;"><span>        sort(id, id <span style="color:#f92672">+</span> n, [<span style="color:#f92672">&amp;</span>](<span style="color:#66d9ef">int</span> i, <span style="color:#66d9ef">int</span> j) { <span style="color:#66d9ef">return</span> vals[i] <span style="color:#f92672">&lt;</span> vals[j]; });
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> x : id) {
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">int</span> vx <span style="color:#f92672">=</span> vals[x], fx <span style="color:#f92672">=</span> find(x);
+</span></span><span style="display:flex;"><span>            <span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> y : g[x]) {
+</span></span><span style="display:flex;"><span>                y <span style="color:#f92672">=</span> find(y);
+</span></span><span style="display:flex;"><span>                <span style="color:#66d9ef">if</span> (y <span style="color:#f92672">==</span> fx <span style="color:#f92672">||</span> vals[y] <span style="color:#f92672">&gt;</span> vx) <span style="color:#66d9ef">continue</span>; <span style="color:#75715e">// 只考虑最大节点值比 vx 小的连通块
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                <span style="color:#66d9ef">if</span> (vals[y] <span style="color:#f92672">==</span> vx) { <span style="color:#75715e">// 可以构成好路径
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    ans <span style="color:#f92672">+=</span> size[fx] <span style="color:#f92672">*</span> size[y]; <span style="color:#75715e">// 乘法原理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                    size[fx] <span style="color:#f92672">+=</span> size[y]; <span style="color:#75715e">// 统计连通块内节点值等于 vx 的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>                }
+</span></span><span style="display:flex;"><span>                fa[y] <span style="color:#f92672">=</span> fx; <span style="color:#75715e">// 把小的节点值合并到大的节点值上
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#66d9ef">return</span> ans;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></div><div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#66d9ef">func</span> <span style="color:#a6e22e">numberOfGoodPaths</span>(<span style="color:#a6e22e">vals</span> []<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">edges</span> [][]<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">n</span> <span style="color:#f92672">:=</span> len(<span style="color:#a6e22e">vals</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">g</span> <span style="color:#f92672">:=</span> make([][]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">e</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">edges</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">x</span>, <span style="color:#a6e22e">y</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">0</span>], <span style="color:#a6e22e">e</span>[<span style="color:#ae81ff">1</span>]
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">g</span>[<span style="color:#a6e22e">x</span>] = append(<span style="color:#a6e22e">g</span>[<span style="color:#a6e22e">x</span>], <span style="color:#a6e22e">y</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">g</span>[<span style="color:#a6e22e">y</span>] = append(<span style="color:#a6e22e">g</span>[<span style="color:#a6e22e">y</span>], <span style="color:#a6e22e">x</span>) <span style="color:#75715e">// 建图
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// 并查集模板
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">fa</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#75715e">// size[x] 表示节点值等于 vals[x] 的节点个数，如果按照节点值从小到大合并，size[x] 也是连通块内的等于最大节点值的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#a6e22e">size</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span>) 
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">id</span> <span style="color:#f92672">:=</span> make([]<span style="color:#66d9ef">int</span>, <span style="color:#a6e22e">n</span>) <span style="color:#75715e">// 后面排序用
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">i</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">fa</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">i</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">size</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#ae81ff">1</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">id</span>[<span style="color:#a6e22e">i</span>] = <span style="color:#a6e22e">i</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">var</span> <span style="color:#a6e22e">find</span> <span style="color:#66d9ef">func</span>(<span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">find</span> = <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">x</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">int</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">x</span>] <span style="color:#f92672">!=</span> <span style="color:#a6e22e">x</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">x</span>] = <span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">x</span>])
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">x</span>]
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">ans</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">n</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a6e22e">sort</span>.<span style="color:#a6e22e">Slice</span>(<span style="color:#a6e22e">id</span>, <span style="color:#66d9ef">func</span>(<span style="color:#a6e22e">i</span>, <span style="color:#a6e22e">j</span> <span style="color:#66d9ef">int</span>) <span style="color:#66d9ef">bool</span> { <span style="color:#66d9ef">return</span> <span style="color:#a6e22e">vals</span>[<span style="color:#a6e22e">id</span>[<span style="color:#a6e22e">i</span>]] &lt; <span style="color:#a6e22e">vals</span>[<span style="color:#a6e22e">id</span>[<span style="color:#a6e22e">j</span>]] })
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">x</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">id</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">vx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">vals</span>[<span style="color:#a6e22e">x</span>]
+</span></span><span style="display:flex;"><span>		<span style="color:#a6e22e">fx</span> <span style="color:#f92672">:=</span> <span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">x</span>)
+</span></span><span style="display:flex;"><span>		<span style="color:#66d9ef">for</span> <span style="color:#a6e22e">_</span>, <span style="color:#a6e22e">y</span> <span style="color:#f92672">:=</span> <span style="color:#66d9ef">range</span> <span style="color:#a6e22e">g</span>[<span style="color:#a6e22e">x</span>] {
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">y</span> = <span style="color:#a6e22e">find</span>(<span style="color:#a6e22e">y</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">y</span> <span style="color:#f92672">==</span> <span style="color:#a6e22e">fx</span> <span style="color:#f92672">||</span> <span style="color:#a6e22e">vals</span>[<span style="color:#a6e22e">y</span>] &gt; <span style="color:#a6e22e">vx</span> { <span style="color:#75715e">// 只考虑最大节点值比 vx 小的连通块
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#66d9ef">continue</span>
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#66d9ef">if</span> <span style="color:#a6e22e">vals</span>[<span style="color:#a6e22e">y</span>] <span style="color:#f92672">==</span> <span style="color:#a6e22e">vx</span> { <span style="color:#75715e">// 可以构成好路径
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#a6e22e">ans</span> <span style="color:#f92672">+=</span> <span style="color:#a6e22e">size</span>[<span style="color:#a6e22e">fx</span>] <span style="color:#f92672">*</span> <span style="color:#a6e22e">size</span>[<span style="color:#a6e22e">y</span>] <span style="color:#75715e">// 乘法原理
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>				<span style="color:#a6e22e">size</span>[<span style="color:#a6e22e">fx</span>] <span style="color:#f92672">+=</span> <span style="color:#a6e22e">size</span>[<span style="color:#a6e22e">y</span>] <span style="color:#75715e">// 统计连通块内节点值等于 vx 的节点个数
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>			}
+</span></span><span style="display:flex;"><span>			<span style="color:#a6e22e">fa</span>[<span style="color:#a6e22e">y</span>] = <span style="color:#a6e22e">fx</span> <span style="color:#75715e">// 把小的节点值合并到大的节点值上
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#66d9ef">return</span> <span style="color:#a6e22e">ans</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="复杂度分析">复杂度分析</h4>
+<ul>
+<li>时间复杂度：$O(n\log n)$，其中 $n$ 为 $\textit{vals}$ 的长度。</li>
+<li>空间复杂度：$O(n)$。</li>
+</ul>
+</article>
+
+        </main><footer id="footer">
+    
+</footer>
+</body>
+</html>
