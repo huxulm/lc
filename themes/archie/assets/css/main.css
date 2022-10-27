@@ -44,13 +44,13 @@ blockquote {
 }
 
 a {
-  border-bottom: 3px solid var(--maincolor);
+  border-bottom: 1px dashed var(--maincolor);
   color: inherit;
   text-decoration: none;
 }
-a:hover {
-  background-color: var(--hovercolor);
-  color: #fff;
+
+a.aa-ItemLink {
+  border-bottom: none
 }
 
 ul {
@@ -58,11 +58,11 @@ ul {
   padding-left: 2ch;
 }
 ul li {
-  text-indent: -2ch;
+  /* text-indent: -2ch; */
 }
 ul > li::before {
-  content: "* ";
-  font-weight: bold;
+  /* content: "* "; */
+  /* font-weight: bold; */
 }
 
 /* Images */
@@ -104,7 +104,7 @@ code {
 }
 
 pre {
-  background-color: #ececec;
+  background-color: #f1f1f1;
   line-height: 1.4;
   overflow-x: auto;
   padding: 1em;
@@ -287,12 +287,12 @@ svg {
 
   position: absolute;
   z-index: 2;
-  top: -29px;
+  top: -27px;
   font-size: 14px;
   font-weight: 700;
   line-height: 14px;
   letter-spacing: 0.5px;
-  width: 30px;
+  width: 50px;
   color: #ffffff;
   background-color: #000000;
   border: 1px solid transparent;
@@ -333,7 +333,7 @@ svg {
 }
 .highlight pre code[class*="language-python"]::before,
 .highlight pre code[class*="language-py"]::before {
-  content: "py";
+  content: "Py";
   background: blue;
   color: yellow;
 }
@@ -369,4 +369,20 @@ table th {
 table td {
   padding: 6px 13px;
   border: 1px solid #dfe2e5;
+}
+
+#autocomplete > ul li {
+  text-indent: 0%;
+}
+
+li.post {
+  display: inline-flex;
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+ul.pagination {
+  display: flex;
+  justify-content: center;
 }

@@ -2,7 +2,7 @@ function createCopyButton(highlightDiv) {
   const button = document.createElement("button");
   button.className = "copy-code-button";
   button.type = "button";
-  button.innerText = "Copy";
+  button.innerText = "复制";
   button.addEventListener("click", () =>
     copyCodeToClipboard(button, highlightDiv)
   );
@@ -29,9 +29,9 @@ async function copyCodeToClipboard(button, highlightDiv) {
     copyCodeBlockExecCommand(codeToCopy, highlightDiv);
   } finally {
     button.blur();
-    button.innerText = "Copied!";
+    button.innerText = "已复制!";
     setTimeout(function () {
-      button.innerText = "Copy";
+      button.innerText = "复制";
     }, 2000);
   }
 }

@@ -6,34 +6,34 @@ copyright = "© LC"
 pygmentsstyle = "monokai"
 pygmentscodefences = true
 pygmentscodefencesguesssyntax = true
-
 [[menu.main]]
-name = "Home"
+name = "首页"
 url = "/"
 weight = 1
 
 [[menu.main]]
-name = "All posts"
+name = "所有题解"
 url = "/posts"
 weight = 2
 
-[[menu.main]]
-name = "About"
-url = "/about"
-weight = 3
-
-[[menu.main]]
-name = "Tags"
-url = "/tags"
-weight = 4
-
 theme = "archie"
 [params]
-    math = true
+paginates = 50
+paginatePath = "ppg"
+math = true
+search = true
 
 [markup]
   [markup.highlight]
     anchorLineNos = false
     codeFences = true
+    guessSyntax = false
+    hl_Lines = ''
+    lineAnchors = ''
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = false
+    noHl = false
     style = 'monokailight'
     tabWidth = 4

@@ -16,6 +16,8 @@
 	<!-- math -->
 	{{ if .Site.Params.math }}{{ partial "helpers/katex.html" . }}{{ end }}
 
+	{{ if .Site.Params.search }}{{ partial "helpers/search.html" . }}{{ end }}
+
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description"
 		content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end }}" />
@@ -32,6 +34,7 @@
 	{{- else if or (isset .Site.Params "social") (eq .Site.Params.mode "toggle") -}}
 	<script src="{{ .Site.BaseURL }}js/feather.min.js"></script>
 	{{ end }}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css">
 	{{ if .Site.Params.useCDN | default false -}}
 	<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@1,500&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css2?family=Fira+Sans&display=swap" rel="stylesheet">
@@ -45,7 +48,8 @@
 	<link rel="stylesheet" type="text/css" media="screen" href="{{ $style.Permalink }}" />
 	{{ $style := resources.Get "css/copy-code-button.css" | fingerprint }}
 	<link rel="stylesheet" type="text/css" media="screen" href="{{ $style.Permalink }}" />
-
+	{{ $syntax := resources.Get "css/syntax.css" | minify }}
+    <link href="{{ $syntax.RelPermalink }}" rel="stylesheet">
 	{{- if or (eq .Site.Params.mode "auto") (eq .Site.Params.mode "dark") (eq .Site.Params.mode "toggle") -}}
 	{{ $darkstyle := resources.Get "css/dark.css" | fingerprint }}
 	<link id="darkModeStyle" rel="stylesheet" type="text/css" href="{{ $darkstyle.Permalink }}" {{ if eq
@@ -67,4 +71,9 @@
 	</script>
 		{{- end }}
 		{{- end }}
+
+	<!-- search css -->
+	{{ if .Site.Params.search }}
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@algolia/autocomplete-theme-classic"/>
+	{{ end }}
 </head>

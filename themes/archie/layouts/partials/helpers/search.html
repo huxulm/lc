@@ -1,0 +1,58 @@
+<!-- search only version -->
+<script src="https://cdn.jsdelivr.net/npm/algoliasearch@4.14.2/dist/algoliasearch-lite.umd.js"
+    integrity="sha256-dImjLPUsG/6p3+i7gVKBiDM8EemJAhQ0VvkRK2pVsQY=" crossorigin="anonymous"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@algolia/autocomplete-plugin-query-suggestions@1.7.2/dist/umd/index.production.min.js"></script>
+<script
+    src="https://cdn.jsdelivr.net/npm/@algolia/autocomplete-plugin-recent-searches@1.7.2/dist/umd/index.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@algolia/autocomplete-js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const algoliasearch = window['algoliasearch']
+        const { autocomplete, getAlgoliaResults } = window['@algolia/autocomplete-js'];
+        const appId = 'PIBA4C4WI9';
+        const apiKey = '99b342d9ee4c048c72a0e028e54201a9';
+
+        const searchClient = algoliasearch(appId, apiKey);
+        const { createQuerySuggestionsPlugin } = window['@algolia/autocomplete-plugin-query-suggestions']
+        const { createLocalStorageRecentSearchesPlugin } = window['@algolia/autocomplete-plugin-recent-searches']
+        const querySuggestionsPlugin = createQuerySuggestionsPlugin({
+            searchClient,
+            indexName: 'leetcode_query_suggestions',
+            getSearchParams({ state }) {
+                return { hitsPerPage: state.query ? 5 : 10 };
+            },
+            transformSource({ source }) {
+                return {
+                    ...source,
+                    getItemUrl({ item }) {
+                        return `/search?q=${item.query}`;
+                    },
+                    templates: {
+                        item(params) {
+                            const { item, html } = params;
+
+                            return html`<a class="aa-ItemLink" style="" href="/posts/${item.slug}">
+                                <div class="InterfaceDemoHit aa-ItemWrapper">
+                                    <div class="aa-ItemContent">
+                                        <div class="aa-ItemContentBody"><div style="font-weight:600;font-size: 18px;" class="aa-ItemContentTitle PrimaryAttribute">「${item.title}」</div><div class="aa-ItemContentDescription ThirdAttribute">${item.question.frontend_id}.${item.question.title} (${item.tags.join(",")})</div></div>
+                                    </div>
+                                </div>
+                            </a>`;
+                        },
+                    },
+                };
+            },
+        });
+        const recentSearchesPlugin = createLocalStorageRecentSearchesPlugin({
+            key: 'search',
+            limit: 10,
+        });
+        autocomplete({
+            container: '#autocomplete',
+            placeholder: '搜索 LC 题目、题解',
+            plugins: [recentSearchesPlugin, querySuggestionsPlugin],
+        });
+    })
+
+</script>
