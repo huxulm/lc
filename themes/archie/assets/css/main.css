@@ -157,27 +157,21 @@ h6 {
 
 h1::before {
   color: var(--maincolor);
-  content: "# ";
 }
 h2::before {
   color: var(--maincolor);
-  content: "## ";
 }
 h3::before {
   color: var(--maincolor);
-  content: "### ";
 }
 h4::before {
   color: var(--maincolor);
-  content: "#### ";
 }
 h5::before {
   color: var(--maincolor);
-  content: "##### ";
 }
 h6::before {
   color: var(--maincolor);
-  content: "###### ";
 }
 
 .meta {
@@ -189,7 +183,7 @@ h6::before {
 footer {
   display: flex;
   align-items: center;
-  border-top: 0.4rem dotted var(--bordercl);
+  border-top: 1px solid var(--bordercl);
   padding: 2rem 0rem;
   margin-top: 2rem;
 }
@@ -385,4 +379,13 @@ li.post {
 ul.pagination {
   display: flex;
   justify-content: center;
+}
+
+.pagination {
+  --bs-pagination-color: rgb(0, 0, 0);
+  --bs-pagination-border-width: 0;
+  --bs-pagination-border-radius: 0;
+  --bs-pagination-hover-color: black;
+  --bs-pagination-active-border-color: transparent;
+  --bs-pagination-active-bg: rgba(0, 0, 0, 0.1);
 }

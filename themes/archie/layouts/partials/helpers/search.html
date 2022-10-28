@@ -20,7 +20,7 @@
             searchClient,
             indexName: 'leetcode_query_suggestions',
             getSearchParams({ state }) {
-                return { hitsPerPage: state.query ? 5 : 10 };
+                return { hitsPerPage: 10 };
             },
             transformSource({ source }) {
                 return {
