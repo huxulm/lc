@@ -6,7 +6,7 @@ date: 2022-04-24T01:37:17Z
 ---
 # 0ms 最强剪枝
  
-> [原题 LCP 58.积木拼接](https://leetcode.cn/problems/De4qBB)
+> [原文链接](https://leetcode.cn/problems/De4qBB/solution/0ms-zui-qiang-jian-zhi-by-endlesscheng-1beq)
 ![111.png](https://pic.leetcode-cn.com/1650765018-NOZJjI-111.png)
 
 基本思路是搜索每个面放哪块积木，枚举积木的旋转+翻转状态。放之前先检查下当前放的积木和相邻的积木：

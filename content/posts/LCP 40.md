@@ -6,7 +6,7 @@ date: 2021-09-11T09:38:40Z
 ---
 # 排序+贪心
  
-> [原题 LCP 40.心算挑战](https://leetcode.cn/problems/uOAnQW)
+> [原文链接](https://leetcode.cn/problems/uOAnQW/solution/pai-xu-tan-xin-by-endlesscheng-wgk7)
 将 $\textit{cards}$ 从大到小排序，并累加前 $\textit{cnt}$ 个元素之和，记作 $\textit{sum}$，若 $\textit{sum}$ 是偶数则直接返回，若不是偶数，则我们需要从前 $\textit{cnt}$ 个元素中选一个元素 $x$，并从后面找一个最大的且奇偶性和 $x$ 不同的元素替换 $x$，这样就可以使 $\textit{sum}$ 为偶数。
 
 为了使 $\textit{sum}$ 尽可能大，我们需要使替换前后的变化尽可能地小，我们分两种情况讨论：

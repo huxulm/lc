@@ -6,7 +6,7 @@ date: 2021-09-11T09:41:21Z
 ---
 # 动态规划
  
-> [原题 LCP 43.十字路口的交通](https://leetcode.cn/problems/Y1VbOX)
+> [原文链接](https://leetcode.cn/problems/Y1VbOX/solution/dong-tai-gui-hua-by-endlesscheng-bcmi)
 ```go
 var mp = []int{'E': 0, 'S': 1, 'W': 2, 'N': 3} // 将方向字符映射到 0-3 上
 var valid = [4][4][4]int{ // 当前车去方向，另一辆车来方向，另一辆车去方向

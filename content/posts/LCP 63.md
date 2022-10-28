@@ -6,7 +6,7 @@ date: 2022-09-24T14:59:05Z
 ---
 # 暴力枚举模拟
  
-> [原题 LCP 63.弹珠游戏](https://leetcode.cn/problems/EXvqDp)
+> [原文链接](https://leetcode.cn/problems/EXvqDp/solution/mei-ju-by-endlesscheng-5wzf)
 个人赛五道题目的 [视频讲解](https://www.bilibili.com/video/BV1zN4y1K762) 已出炉，欢迎点赞三连，在评论区分享你对这场比赛的看法~
 
 ---

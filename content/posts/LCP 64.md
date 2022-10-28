@@ -6,7 +6,7 @@ date: 2022-09-24T14:32:08Z
 ---
 # 树形 DP
  
-> [原题 LCP 64.二叉树灯饰](https://leetcode.cn/problems/U7WvvU)
+> [原文链接](https://leetcode.cn/problems/U7WvvU/solution/shu-xing-dp-by-endlesscheng-isuo)
 个人赛五道题目的 [视频讲解](https://www.bilibili.com/video/BV1zN4y1K762) 已出炉，欢迎点赞三连，在评论区分享你对这场比赛的看法~
 
 ---

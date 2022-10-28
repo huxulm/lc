@@ -6,7 +6,7 @@ date: 2021-09-25T10:05:46Z
 ---
 # Go DFS+哈希表
  
-> [原题 LCP 44.开幕式焰火](https://leetcode.cn/problems/sZ59z6)
+> [原文链接](https://leetcode.cn/problems/sZ59z6/solution/go-dfsha-xi-biao-by-endlesscheng-lqli)
 ```go
 func numColor(root *TreeNode) int {
 	color := map[int]bool{}

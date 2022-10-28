@@ -6,7 +6,7 @@ date: 2022-10-07T23:35:17Z
 ---
 # Python 一行
  
-> [原题 LCP 66.最小展台数量](https://leetcode.cn/problems/600YaG)
+> [原文链接](https://leetcode.cn/problems/600YaG/solution/python-yi-xing-by-endlesscheng-6s44)
 `Counter` 本质上表示的是一个多重集，直接用 `|` 就可以计算并集了。
 
 ```py [sol1-Python3]

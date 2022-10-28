@@ -6,7 +6,7 @@ date: 2022-09-25T01:40:11Z
 ---
 # 一些简化代码的技巧
  
-> [原题 LCP 61.气温变化趋势](https://leetcode.cn/problems/6CE719)
+> [原文链接](https://leetcode.cn/problems/6CE719/solution/mo-ni-by-endlesscheng-mc05)
 ```py [sol1-Python]
 class Solution:
     def temperatureTrend(self, temperatureA: List[int], temperatureB: List[int]) -> int:

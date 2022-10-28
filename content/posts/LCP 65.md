@@ -6,7 +6,7 @@ date: 2022-09-24T15:52:46Z
 ---
 # 数形结合 + 巧妙地定义状态（Python/Java/C++/Go）
  
-> [原题 LCP 65.舒适的湿度](https://leetcode.cn/problems/3aqs1c)
+> [原文链接](https://leetcode.cn/problems/3aqs1c/solution/by-endlesscheng-fu9b)
 个人赛五道题目的 [视频讲解](https://www.bilibili.com/video/BV1zN4y1K762) 已出炉，欢迎点赞三连，在评论区分享你对这场比赛的看法~
 
 ---

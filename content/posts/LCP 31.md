@@ -6,7 +6,7 @@ date: 2021-04-05T16:40:32Z
 ---
 # DFS 48ms
  
-> [原题 LCP 31.变换的迷宫](https://leetcode.cn/problems/Db3wC1)
+> [原文链接](https://leetcode.cn/problems/Db3wC1/solution/dfs-48ms-by-endlesscheng-ckzn)
 ```
 var dir4 = []struct{ x, y int }{{-1, 0}, {1, 0}, {0, -1}, {0, 1}}
 

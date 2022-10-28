@@ -6,7 +6,7 @@ date: 2022-10-08T01:21:19Z
 ---
 # 预处理+状压DP
  
-> [原题 LCP 69.Hello LeetCode!](https://leetcode.cn/problems/rMeRt2)
+> [原文链接](https://leetcode.cn/problems/rMeRt2/solution/z-by-endlesscheng-6ver)
 [视频讲解](https://www.bilibili.com/video/BV1rT411P7NA) 已出炉，欢迎点赞三连，在评论区分享你对这场力扣杯的看法~
 
 记录关键思路，详细的说明见视频讲解。

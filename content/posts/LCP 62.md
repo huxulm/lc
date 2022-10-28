@@ -6,7 +6,7 @@ date: 2022-09-25T01:31:28Z
 ---
 # 按题意模拟
  
-> [原题 LCP 62.交通枢纽](https://leetcode.cn/problems/D9PW8w)
+> [原文链接](https://leetcode.cn/problems/D9PW8w/solution/an-zhao-ti-yi-mo-ni-by-endlesscheng-41jb)
 ```py [sol1-Python]
 class Solution:
     def transportationHub(self, path: List[List[int]]) -> int:

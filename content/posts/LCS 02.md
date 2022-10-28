@@ -6,7 +6,7 @@ date: 2021-06-19T07:51:13Z
 ---
 # 贪心
  
-> [原题 LCS 02.完成一半题目](https://leetcode.cn/problems/WqXACV)
+> [原文链接](https://leetcode.cn/problems/WqXACV/solution/tan-xin-by-endlesscheng-kz1d)
 统计每个数的个数，按个数从大到小排序，然后依次选择直到选择个数超过 $n/2$。
 
 ```go

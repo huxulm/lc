@@ -6,7 +6,7 @@ date: 2022-10-07T11:14:39Z
 ---
 # 极简写法：调用自身
  
-> [原题 LCP 67.装饰树](https://leetcode.cn/problems/KnLfVT)
+> [原文链接](https://leetcode.cn/problems/KnLfVT/solution/jijian-by-endlesscheng-4oqo)
 调用自身。
 
 ```py [sol1-Python]

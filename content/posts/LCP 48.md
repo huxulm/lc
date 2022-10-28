@@ -6,7 +6,7 @@ date: 2021-09-25T10:56:25Z
 ---
 # 分类讨论+枚举
  
-> [原题 LCP 48.无限棋局](https://leetcode.cn/problems/fsa7oZ)
+> [原文链接](https://leetcode.cn/problems/fsa7oZ/solution/fen-lei-tao-lun-mei-ju-by-endlesscheng-89hq)
 分类讨论题：
 
 1. 黑第一手就可以获胜，输出 `"Black"`

@@ -6,7 +6,7 @@ date: 2021-09-25T10:07:14Z
 ---
 # 状态设计+BFS 
  
-> [原题 LCP 45.自行车炫技赛场](https://leetcode.cn/problems/kplEvH)
+> [原文链接](https://leetcode.cn/problems/kplEvH/solution/zhuang-tai-she-ji-bfs-by-endlesscheng-nf0j)
 根据题目的数据范围，选手到任意位置的速度至多为 $101$，那么可以用 $(x,y,\textit{speed})$ 表示状态，从起点 $(\textit{position}[0],\textit{position}[1],1)$ 开始跑 BFS。
 
 BFS 结束后，如果 $(x,y,1)$ 被访问过，那么将 $(x,y)$ 计入答案中。注意起点不能计入答案。

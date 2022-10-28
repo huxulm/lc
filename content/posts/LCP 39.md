@@ -6,7 +6,7 @@ date: 2021-09-11T09:37:46Z
 ---
 # 用哈希表统计差异
  
-> [原题 LCP 39.无人机方阵](https://leetcode.cn/problems/0jQkd0)
+> [原文链接](https://leetcode.cn/problems/0jQkd0/solution/jian-ji-xie-fa-yong-ha-xi-biao-tong-ji-c-7qzn)
 ```go
 func minimumSwitchingTimes(source, target [][]int) (ans int) {
 	cnt := map[int]int{}

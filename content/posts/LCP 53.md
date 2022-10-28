@@ -6,7 +6,7 @@ date: 2022-04-16T13:25:29Z
 ---
 # O(n*3^m) 子集状压 DP + 贪心预处理（Python/Java/C++/Go）
  
-> [原题 LCP 53.守护太空城](https://leetcode.cn/problems/EJvmW4)
+> [原文链接](https://leetcode.cn/problems/EJvmW4/solution/by-endlesscheng-pk2q)
 #### 提示 1
 
 考虑计算前 $i$ 个舱室需要的最小能量，由于题目中只有联合屏障会涉及到相邻的舱室，因此可以往 DP 上去思考。

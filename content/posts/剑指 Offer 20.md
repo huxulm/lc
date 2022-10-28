@@ -6,7 +6,7 @@ date: 2021-01-15T13:59:46Z
 ---
 # Golang 花式过题
  
-> [原题 剑指 Offer 20.表示数值的字符串](https://leetcode.cn/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof)
+> [原文链接](https://leetcode.cn/problems/biao-shi-shu-zhi-de-zi-fu-chuan-lcof/solution/golang-hua-shi-guo-ti-by-endlesscheng-g3hm)
 这题标准解法是手撸一个 DFA，或者用正则匹配。
 
 另一种类似正则匹配的方法是用 `big.Float` 来读入这个字符串，但是由于它无法支持超过 `int32` 范围的指数，需要稍微改造一下，把指数部分提出来读入。

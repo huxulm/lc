@@ -6,7 +6,7 @@ date: 2021-09-11T09:39:43Z
 ---
 # 暴力枚举
  
-> [原题 LCP 41.黑白翻转棋](https://leetcode.cn/problems/fHi6rV)
+> [原文链接](https://leetcode.cn/problems/fHi6rV/solution/bao-li-mei-ju-by-endlesscheng-dbco)
 枚举每个空格放上黑棋后，能翻转多少白棋，然后就是一些实现细节了，具体见代码注释。
 
 ```go

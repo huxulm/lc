@@ -6,7 +6,7 @@ date: 2021-09-25T10:16:30Z
 ---
 # 转换为 01 背包方案数
  
-> [原题 LCP 47.入场安检](https://leetcode.cn/problems/oPs9Bm)
+> [原文链接](https://leetcode.cn/problems/oPs9Bm/solution/zhuan-huan-wei-01-bei-bao-fang-an-shu-by-1dax)
 根据题意：
 
 - 对于类型为先进先出（队列）的安检室，第一个进入的人总是第一个出去的；

@@ -6,7 +6,7 @@ date: 2022-08-22T11:23:12Z
 ---
 # 倒序回答 + 并查集（Python/Java/C++/Go）
  
-> [原题 meituan-002.小美的仓库整理](https://leetcode.cn/problems/TJZLyC)
+> [原文链接](https://leetcode.cn/problems/TJZLyC/solution/dao-xu-hui-da-bing-cha-ji-by-endlesschen-sdki)
 本题 [视频讲解](https://www.bilibili.com/video/BV1Kd4y1Z7Fv?t=17m44s) 已出炉，欢迎点赞三连，在评论区分享你对这场双周赛的看法~
 
 ---
