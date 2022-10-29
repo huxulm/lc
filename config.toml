@@ -6,6 +6,8 @@ copyright = "© LC"
 pygmentsstyle = "monokai"
 pygmentscodefences = true
 pygmentscodefencesguesssyntax = true
+timeZone = "Asia/Shanghai"
+
 [[menu.main]]
 name = "首页"
 url = "/"
